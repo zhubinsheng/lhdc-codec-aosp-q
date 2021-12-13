@@ -4842,6 +4842,13 @@ public final class Settings {
         public static final String BLUETOOTH_ON = Global.BLUETOOTH_ON;
 
         private static final Validator BLUETOOTH_ON_VALIDATOR = BOOLEAN_VALIDATOR;
+        
+        /**
+         * @deprecated Use {@link android.provider.Settings.Global#BLUETOOTH_A2DPSINK} instead
+         */
+        @Deprecated
+        public static final String BLUETOOTH_A2DPSINK = Global.BLUETOOTH_A2DPSINK;
+        private static final Validator BLUETOOTH_A2DPSINK_VALIDATOR = BOOLEAN_VALIDATOR;        
 
         /**
          * @deprecated Use {@link android.provider.Settings.Global#DATA_ROAMING} instead
@@ -5127,6 +5134,7 @@ public final class Settings {
             MOVED_TO_GLOBAL.add(Settings.Global.ADB_ENABLED);
             MOVED_TO_GLOBAL.add(Settings.Global.ASSISTED_GPS_ENABLED);
             MOVED_TO_GLOBAL.add(Settings.Global.BLUETOOTH_ON);
+            MOVED_TO_GLOBAL.add(Settings.Global.BLUETOOTH_A2DPSINK);
             MOVED_TO_GLOBAL.add(Settings.Global.BUGREPORT_IN_POWER_MENU);
             MOVED_TO_GLOBAL.add(Settings.Global.CDMA_CELL_BROADCAST_SMS);
             MOVED_TO_GLOBAL.add(Settings.Global.CDMA_ROAMING_MODE);
@@ -5816,6 +5824,13 @@ public final class Settings {
         public static final String BLUETOOTH_ON = Global.BLUETOOTH_ON;
 
         private static final Validator BLUETOOTH_ON_VALIDATOR = BOOLEAN_VALIDATOR;
+        
+        /**
+         * @deprecated Use {@link android.provider.Settings.Global#BLUETOOTH_ON} instead
+         */
+        @Deprecated
+        public static final String BLUETOOTH_A2DPSINK = Global.BLUETOOTH_A2DPSINK;
+        private static final Validator BLUETOOTH_A2DPSINK_VALIDATOR = BOOLEAN_VALIDATOR;
 
         /**
          * @deprecated Use {@link android.provider.Settings.Global#DATA_ROAMING} instead
@@ -9750,6 +9765,13 @@ public final class Settings {
         public static final String BLUETOOTH_ON = "bluetooth_on";
 
         private static final Validator BLUETOOTH_ON_VALIDATOR = BOOLEAN_VALIDATOR;
+        
+        /**
+         * Whether bluetooth A2DP Sink is enabled/disabled
+         * 0=disabled. 1=enabled.
+         */
+        public static final String BLUETOOTH_A2DPSINK = "bluetooth_a2dpsink";        
+        private static final Validator BLUETOOTH_A2DPSINK_VALIDATOR = BOOLEAN_VALIDATOR;        
 
         /**
          * CDMA Cell Broadcast SMS
@@ -13874,6 +13896,7 @@ public final class Settings {
             LOW_POWER_MODE_STICKY_AUTO_DISABLE_ENABLED,
             LOW_POWER_MODE_STICKY_AUTO_DISABLE_LEVEL,
             BLUETOOTH_ON,
+            BLUETOOTH_A2DPSINK,
             PRIVATE_DNS_MODE,
             PRIVATE_DNS_SPECIFIER,
             SOFT_AP_TIMEOUT_ENABLED,
@@ -13927,6 +13950,8 @@ public final class Settings {
             VALIDATORS.put(DYNAMIC_POWER_SAVINGS_DISABLE_THRESHOLD,
                     DYNAMIC_POWER_SAVINGS_VALIDATOR);
             VALIDATORS.put(BLUETOOTH_ON, BLUETOOTH_ON_VALIDATOR);
+            VALIDATORS.put(BLUETOOTH_A2DPSINK, BLUETOOTH_A2DPSINK_VALIDATOR);
+            
             VALIDATORS.put(PRIVATE_DNS_MODE, PRIVATE_DNS_MODE_VALIDATOR);
             VALIDATORS.put(PRIVATE_DNS_SPECIFIER, PRIVATE_DNS_SPECIFIER_VALIDATOR);
             VALIDATORS.put(SOFT_AP_TIMEOUT_ENABLED, SOFT_AP_TIMEOUT_ENABLED_VALIDATOR);

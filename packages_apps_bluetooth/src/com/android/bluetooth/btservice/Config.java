@@ -103,7 +103,15 @@ public class Config {
     };
 
     private static Class[] sSupportedProfiles = new Class[0];
-
+    
+    
+    private static boolean isBluetoothPersistedA2DPSinkOn(Context context) {
+    	final ContentResolver resolver = context.getContentResolver();
+        int state = Settings.Global.getInt(resolver, Settings.Global.BLUETOOTH_A2DPSINK, 0);
+        Log.d(TAG, "persisted A2DP Sink state: " + state);
+        return (state != 0);
+    }
+    
     static void init(Context ctx) {
         if (ctx == null) {
             return;
@@ -122,6 +130,17 @@ public class Config {
                 Log.v(TAG, "Feature Flag enables support for HearingAidService");
                 supported = true;
             }
+            
+            if (config.mClass == A2dpSinkService.class) {
+            	if (isBluetoothPersistedA2DPSinkOn(ctx)) {
+            		Log.d(TAG, "A2DP Sink UI Switch State: On!");
+            		supported = true;
+            	}else {
+            		Log.d(TAG, "A2DP Sink UI Switch State: Off!");
+            		supported = false;
+            	}
+            }
+	            
 
             if (supported && !isProfileDisabled(ctx, config.mMask)) {
                 Log.v(TAG, "Adding " + config.mClass.getSimpleName());

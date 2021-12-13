@@ -36,6 +36,8 @@ cc_library_static {
         "external/libldac/abr/inc",
         "external/liblhdc/inc",
         "external/liblhdc/include",
+        "external/liblhdcdec/inc",
+        "external/liblhdcdec/include",
         "system/bt",
         "system/bt/btcore/include",
         "system/bt/vnd/include",
@@ -74,6 +76,8 @@ cc_library_static {
         "a2dp/a2dp_vendor_lhdcv2_encoder.cc",
         "a2dp/a2dp_vendor_lhdcv3.cc",
         "a2dp/a2dp_vendor_lhdcv3_encoder.cc",
+        "a2dp/a2dp_vendor_lhdcv3_dec.cc",
+        "a2dp/a2dp_vendor_lhdcv3_decoder.cc",
         "avct/avct_api.cc",
         "avct/avct_bcb_act.cc",
         "avct/avct_ccb.cc",
@@ -191,6 +195,7 @@ cc_library_static {
         "libldacBT_enc",
         "libldacBT_abr",
         "liblhdcBT_enc",
+        "liblhdcBT_dec",
     ],
 }
 

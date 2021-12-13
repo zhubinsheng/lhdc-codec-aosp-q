@@ -34,6 +34,7 @@
 #include "a2dp_vendor_lhdcv1.h"
 #include "a2dp_vendor_lhdcv2.h"
 #include "a2dp_vendor_lhdcv3.h"
+#include "a2dp_vendor_lhdcv3_dec.h"
 #include "bta/av/bta_av_int.h"
 #include "osi/include/log.h"
 #include "osi/include/properties.h"
@@ -145,6 +146,9 @@ A2dpCodecConfig* A2dpCodecConfig::createCodec(
       break;
     case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV1:
       codec_config = new A2dpCodecConfigLhdcV1(codec_priority);
+      break;
+    case BTAV_A2DP_CODEC_INDEX_SINK_LHDCV3:
+      codec_config = new A2dpCodecConfigLhdcV3Sink(codec_priority);
       break;
     case BTAV_A2DP_CODEC_INDEX_MAX:
       break;

@@ -529,6 +529,8 @@ bool a2dp_get_selected_hal_codec_config(CodecConfiguration* codec_config) {
       codec_config->config.ldacConfig(ldac_config);
       break;
     }
+	case BTAV_A2DP_CODEC_INDEX_SINK_LHDCV3:
+      [[fallthrough]];
     case BTAV_A2DP_CODEC_INDEX_MAX:
       [[fallthrough]];
     default:

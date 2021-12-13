@@ -132,6 +132,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
 
     // Bluetooth persisted setting is off
     private static final int BLUETOOTH_OFF = 0;
+    private static final int BLUETOOTH_A2DPSINK_OFF = 0;
     // Bluetooth persisted setting is on
     // and Airplane mode won't affect Bluetooth state at start up
     private static final int BLUETOOTH_ON_BLUETOOTH = 1;
@@ -199,6 +200,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
     // synchronize with broadcast receiver.
     private boolean mQuietEnableExternal;
     private boolean mEnableExternal;
+    private boolean mA2DPSinkEnableExternal;
 
     // Map of apps registered to keep BLE scanning on.
     private Map<IBinder, ClientDeathRecipient> mBleApps =
@@ -387,6 +389,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
         mState = BluetoothAdapter.STATE_OFF;
         mQuietEnableExternal = false;
         mEnableExternal = false;
+        mA2DPSinkEnableExternal = false;
         mAddress = null;
         mName = null;
         mErrorRecoveryRetryCounter = 0;
@@ -424,6 +427,13 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
                 Slog.d(TAG, "Startup: Bluetooth persisted state is ON.");
             }
             mEnableExternal = true;
+        }
+        
+        if (isBluetoothPersistedA2DPSinkOn()) {
+            mA2DPSinkEnableExternal = true;
+            Slog.d(TAG, "Startup: Get persisted A2DP Sink state is ON.");
+        } else {
+        	Slog.d(TAG, "Startup: Get persisted A2DP Sink state is OFF.");
         }
 
         String airplaneModeRadios =
@@ -477,6 +487,15 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
         }
         return state != BLUETOOTH_OFF;
     }
+    
+    private boolean isBluetoothPersistedA2DPSinkOn() {
+        if (!supportBluetoothPersistedState()) {
+            return false;
+        }
+        int state = Settings.Global.getInt(mContentResolver, Settings.Global.BLUETOOTH_A2DPSINK, 0);
+        Slog.d(TAG, "Bluetooth A2DP Sink persisted state: " + state);
+        return state != BLUETOOTH_A2DPSINK_OFF;
+    }
 
     /**
      *  Returns true if the Bluetooth saved state is BLUETOOTH_ON_BLUETOOTH
@@ -499,6 +518,17 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
         // waive WRITE_SECURE_SETTINGS permission check
         long callingIdentity = Binder.clearCallingIdentity();
         Settings.Global.putInt(mContext.getContentResolver(), Settings.Global.BLUETOOTH_ON, value);
+        Binder.restoreCallingIdentity(callingIdentity);
+    }
+    
+    /**
+     *  Save the Bluetooth A2DP Sink on/off state
+     */
+    private void persistBluetoothA2DPSinkSetting(int value) {
+        Slog.d(TAG, "Persisting Bluetooth A2DP Sink Setting: " + value);
+        // waive WRITE_SECURE_SETTINGS permission check
+        long callingIdentity = Binder.clearCallingIdentity();
+        Settings.Global.putInt(mContext.getContentResolver(), Settings.Global.BLUETOOTH_A2DPSINK, value);
         Binder.restoreCallingIdentity(callingIdentity);
     }
 
@@ -971,6 +1001,16 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
         synchronized (mReceiver) {
             if (persist) {
                 persistBluetoothSetting(BLUETOOTH_OFF);
+                
+                if(mA2DPSinkEnableExternal == false) {
+                	Slog.d(TAG, "disable(): Toggle A2DP Sink state from OFF to ON then store to persist!");
+                	mA2DPSinkEnableExternal = true;
+                	persistBluetoothA2DPSinkSetting(1);                	
+                } else {
+                	Slog.d(TAG, "disable(): Toggle A2DP Sink state from ON to OFF then store to persist!");
+                	mA2DPSinkEnableExternal = false;
+                	persistBluetoothA2DPSinkSetting(0);	
+                }
             }
             mEnableExternal = false;
             sendDisableMsg(BluetoothProtoEnums.ENABLE_DISABLE_REASON_APPLICATION_REQUEST,

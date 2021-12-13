@@ -95,6 +95,7 @@ cc_library_shared {
         "libldacBT_enc",
         "libldacBT_abr",
         "liblhdcBT_enc",
+		"liblhdcBT_dec",
     ],
     cflags: [
         "-DBUILDCFG",

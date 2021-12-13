@@ -148,7 +148,7 @@ typedef enum {
 
 
 //Only supported stereo
-#define A2DP_LHDC_CHANNEL_MODE_STEREO 0x01
+#define A2DP_LHDC_CHANNEL_MODE_STEREO 0x03
 
 #define A2DP_LHDC_BITRATE_900K		0x01
 #define A2DP_LHDC_BITRATE_600K		0x02
