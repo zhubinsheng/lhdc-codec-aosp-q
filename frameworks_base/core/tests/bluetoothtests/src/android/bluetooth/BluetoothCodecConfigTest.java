@@ -34,6 +34,9 @@ public class BluetoothCodecConfigTest extends TestCase {
         BluetoothCodecConfig.SOURCE_CODEC_TYPE_APTX,
         BluetoothCodecConfig.SOURCE_CODEC_TYPE_APTX_HD,
         BluetoothCodecConfig.SOURCE_CODEC_TYPE_LDAC,
+        BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV3,
+        BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV2,
+        BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV1,
         BluetoothCodecConfig.SOURCE_CODEC_TYPE_MAX,
         BluetoothCodecConfig.SOURCE_CODEC_TYPE_INVALID,
     };
@@ -203,6 +206,15 @@ public class BluetoothCodecConfigTest extends TestCase {
             }
             if (codec_type == BluetoothCodecConfig.SOURCE_CODEC_TYPE_LDAC) {
                 assertEquals("LDAC", bcc.getCodecName());
+            }
+            if (codec_type == BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV3) {
+                assertEquals("LHDC V3", bcc.getCodecName());
+            }
+            if (codec_type == BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV2) {
+                assertEquals("LHDC V2", bcc.getCodecName());
+            }
+            if (codec_type == BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV1) {
+                assertEquals("LHDC V1", bcc.getCodecName());
             }
             if (codec_type == BluetoothCodecConfig.SOURCE_CODEC_TYPE_MAX) {
                 assertEquals("UNKNOWN CODEC(" + BluetoothCodecConfig.SOURCE_CODEC_TYPE_MAX + ")",

@@ -44,7 +44,13 @@ public final class BluetoothCodecConfig implements Parcelable {
     @UnsupportedAppUsage
     public static final int SOURCE_CODEC_TYPE_LDAC = 4;
     @UnsupportedAppUsage
-    public static final int SOURCE_CODEC_TYPE_MAX = 5;
+    public static final int SOURCE_CODEC_TYPE_LHDCV3 = 5;
+    @UnsupportedAppUsage
+    public static final int SOURCE_CODEC_TYPE_LHDCV2 = 6;
+    @UnsupportedAppUsage
+    public static final int SOURCE_CODEC_TYPE_LHDCV1 = 7;
+    @UnsupportedAppUsage
+    public static final int SOURCE_CODEC_TYPE_MAX = 8;
 
     @UnsupportedAppUsage
     public static final int SOURCE_CODEC_TYPE_INVALID = 1000 * 1000;
@@ -301,6 +307,12 @@ public final class BluetoothCodecConfig implements Parcelable {
                 return "aptX HD";
             case SOURCE_CODEC_TYPE_LDAC:
                 return "LDAC";
+            case SOURCE_CODEC_TYPE_LHDCV3:
+                return "LHDC V3";
+            case SOURCE_CODEC_TYPE_LHDCV2:
+                return "LHDC V2";
+            case SOURCE_CODEC_TYPE_LHDCV1:
+                return "LHDC V1";
             case SOURCE_CODEC_TYPE_INVALID:
                 return "INVALID CODEC";
             default:
@@ -449,6 +461,9 @@ public final class BluetoothCodecConfig implements Parcelable {
     public boolean sameAudioFeedingParameters(BluetoothCodecConfig other) {
         return (other != null && other.mSampleRate == mSampleRate
                 && other.mBitsPerSample == mBitsPerSample
-                && other.mChannelMode == mChannelMode);
+                && other.mChannelMode == mChannelMode
+                && other.mCodecSpecific1 == mCodecSpecific1
+                && other.mCodecSpecific2 == mCodecSpecific2
+		        && other.mCodecSpecific3 == mCodecSpecific3);
     }
 }
