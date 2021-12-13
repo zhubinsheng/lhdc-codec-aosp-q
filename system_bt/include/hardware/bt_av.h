@@ -54,6 +54,9 @@ typedef enum {
   BTAV_A2DP_CODEC_INDEX_SOURCE_APTX,
   BTAV_A2DP_CODEC_INDEX_SOURCE_APTX_HD,
   BTAV_A2DP_CODEC_INDEX_SOURCE_LDAC,
+  BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV3,
+  BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV2,
+  BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV1,
 
   BTAV_A2DP_CODEC_INDEX_SOURCE_MAX,
 
@@ -149,6 +152,15 @@ typedef struct {
       case BTAV_A2DP_CODEC_INDEX_SOURCE_LDAC:
         codec_name_str = "LDAC";
         break;
+      case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV3:
+        codec_name_str = "LHDC V3";
+        break;
+      case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV2:
+        codec_name_str = "LHDC V2";
+        break;
+      case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV1:
+        codec_name_str = "LHDC V1";
+        break;
       case BTAV_A2DP_CODEC_INDEX_SINK_SBC:
         codec_name_str = "SBC (Sink)";
         break;
@@ -236,6 +248,15 @@ typedef struct {
     return result;
   }
 } btav_a2dp_codec_config_t;
+
+/** Structure for pack and forward lhdc data type API's metadata.
+ */
+typedef struct {
+	RawAddress bd_addr;
+	int clen;
+	char* pData;
+} btif_av_codec_lhdc_api_data_t;
+
 
 /** Callback for connection state change.
  *  state will have one of the values from btav_connection_state_t
@@ -326,6 +347,18 @@ typedef struct {
 
   /** Closes the interface. */
   void (*cleanup)(void);
+
+  int (*getApiVer_lhdc)(   /* mapping to lhdc_getApiVer_src */
+      const RawAddress& bd_addr, char* version, int clen);
+
+  int (*getApiCfg_lhdc)(   /* mapping to lhdc_getApiCfg_src */
+      const RawAddress& bd_addr, char* config, int clen);
+
+  int (*setApiCfg_lhdc)(   /* mapping to lhdc_setApiCfg_src */
+      const RawAddress& bd_addr, char* config, int clen);
+
+  void (*setAPiData_lhdc)( /* mapping to lhdc_setApiData_src */
+      const RawAddress& bd_addr, char* data, int clen);
 
 } btav_source_interface_t;
 

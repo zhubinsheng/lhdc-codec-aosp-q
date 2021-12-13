@@ -24,6 +24,9 @@
 #include "a2dp_vendor_aptx.h"
 #include "a2dp_vendor_aptx_hd.h"
 #include "a2dp_vendor_ldac.h"
+#include "a2dp_vendor_lhdcv3.h"
+#include "a2dp_vendor_lhdcv2.h"
+#include "a2dp_vendor_lhdcv1.h"
 #include "bt_target.h"
 #include "osi/include/log.h"
 #include "osi/include/osi.h"
@@ -47,6 +50,21 @@ bool A2DP_IsVendorSourceCodecValid(const uint8_t* p_codec_info) {
   // Check for LDAC
   if (vendor_id == A2DP_LDAC_VENDOR_ID && codec_id == A2DP_LDAC_CODEC_ID) {
     return A2DP_IsVendorSourceCodecValidLdac(p_codec_info);
+  }
+
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_IsVendorSourceCodecValidLhdcV3(p_codec_info);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_IsVendorSourceCodecValidLhdcV2(p_codec_info);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_IsVendorSourceCodecValidLhdcV1(p_codec_info);
   }
 
   // Add checks based on <vendor_id, codec_id>
@@ -103,6 +121,21 @@ bool A2DP_IsVendorPeerSinkCodecValid(const uint8_t* p_codec_info) {
   // Check for LDAC
   if (vendor_id == A2DP_LDAC_VENDOR_ID && codec_id == A2DP_LDAC_CODEC_ID) {
     return A2DP_IsVendorPeerSinkCodecValidLdac(p_codec_info);
+  }
+
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_IsVendorPeerSinkCodecValidLhdcV3(p_codec_info);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_IsVendorPeerSinkCodecValidLhdcV2(p_codec_info);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_IsVendorPeerSinkCodecValidLhdcV1(p_codec_info);
   }
 
   // Add checks based on <vendor_id, codec_id>
@@ -183,6 +216,24 @@ bool A2DP_VendorUsesRtpHeader(bool content_protection_enabled,
                                         p_codec_info);
   }
 
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorUsesRtpHeaderLhdcV3(content_protection_enabled,
+                                          p_codec_info);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorUsesRtpHeaderLhdcV2(content_protection_enabled,
+                                          p_codec_info);
+  }
+
+  // Check for LHDC
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorUsesRtpHeaderLhdcV1(content_protection_enabled,
+                                          p_codec_info);
+  }
+
   // Add checks based on <content_protection_enabled, vendor_id, codec_id>
 
   return true;
@@ -207,6 +258,21 @@ const char* A2DP_VendorCodecName(const uint8_t* p_codec_info) {
   // Check for LDAC
   if (vendor_id == A2DP_LDAC_VENDOR_ID && codec_id == A2DP_LDAC_CODEC_ID) {
     return A2DP_VendorCodecNameLdac(p_codec_info);
+  }
+
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorCodecNameLhdcV3(p_codec_info);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorCodecNameLhdcV2(p_codec_info);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorCodecNameLhdcV1(p_codec_info);
   }
 
   // Add checks based on <vendor_id, codec_id>
@@ -248,6 +314,21 @@ bool A2DP_VendorCodecTypeEquals(const uint8_t* p_codec_info_a,
     return A2DP_VendorCodecTypeEqualsLdac(p_codec_info_a, p_codec_info_b);
   }
 
+  // Check for LHDCV3
+  if (vendor_id_a == A2DP_LHDC_VENDOR_ID && codec_id_a == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorCodecTypeEqualsLhdcV3(p_codec_info_a, p_codec_info_b);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id_a == A2DP_LHDC_VENDOR_ID && codec_id_a == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorCodecTypeEqualsLhdcV2(p_codec_info_a, p_codec_info_b);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id_a == A2DP_LHDC_VENDOR_ID && codec_id_a == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorCodecTypeEqualsLhdcV1(p_codec_info_a, p_codec_info_b);
+  }
+
   // OPTIONAL: Add extra vendor-specific checks based on the
   // vendor-specific data stored in "p_codec_info_a" and "p_codec_info_b".
 
@@ -286,6 +367,21 @@ bool A2DP_VendorCodecEquals(const uint8_t* p_codec_info_a,
   // Check for LDAC
   if (vendor_id_a == A2DP_LDAC_VENDOR_ID && codec_id_a == A2DP_LDAC_CODEC_ID) {
     return A2DP_VendorCodecEqualsLdac(p_codec_info_a, p_codec_info_b);
+  }
+
+  // Check for LHDCV3
+  if (vendor_id_a == A2DP_LHDC_VENDOR_ID && codec_id_a == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorCodecEqualsLhdcV3(p_codec_info_a, p_codec_info_b);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id_a == A2DP_LHDC_VENDOR_ID && codec_id_a == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorCodecEqualsLhdcV2(p_codec_info_a, p_codec_info_b);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id_a == A2DP_LHDC_VENDOR_ID && codec_id_a == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorCodecEqualsLhdcV1(p_codec_info_a, p_codec_info_b);
   }
 
   // Add extra vendor-specific checks based on the
@@ -341,6 +437,22 @@ int A2DP_VendorGetTrackSampleRate(const uint8_t* p_codec_info) {
     return A2DP_VendorGetTrackSampleRateLdac(p_codec_info);
   }
 
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorGetTrackSampleRateLhdcV3(p_codec_info);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorGetTrackSampleRateLhdcV2(p_codec_info);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorGetTrackSampleRateLhdcV1(p_codec_info);
+  }
+
+
   // Add checks based on <vendor_id, codec_id>
 
   return -1;
@@ -367,6 +479,21 @@ int A2DP_VendorGetTrackBitsPerSample(const uint8_t* p_codec_info) {
     return A2DP_VendorGetTrackBitsPerSampleLdac(p_codec_info);
   }
 
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorGetTrackBitsPerSampleLhdcV3(p_codec_info);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorGetTrackBitsPerSampleLhdcV2(p_codec_info);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorGetTrackBitsPerSampleLhdcV1(p_codec_info);
+  }
+
   // Add checks based on <vendor_id, codec_id>
 
   return -1;
@@ -391,6 +518,21 @@ int A2DP_VendorGetTrackChannelCount(const uint8_t* p_codec_info) {
   // Check for LDAC
   if (vendor_id == A2DP_LDAC_VENDOR_ID && codec_id == A2DP_LDAC_CODEC_ID) {
     return A2DP_VendorGetTrackChannelCountLdac(p_codec_info);
+  }
+
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorGetTrackChannelCountLhdcV3(p_codec_info);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorGetTrackChannelCountLhdcV2(p_codec_info);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorGetTrackChannelCountLhdcV1(p_codec_info);
   }
 
   // Add checks based on <vendor_id, codec_id>
@@ -437,6 +579,21 @@ bool A2DP_VendorGetPacketTimestamp(const uint8_t* p_codec_info,
     return A2DP_VendorGetPacketTimestampLdac(p_codec_info, p_data, p_timestamp);
   }
 
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorGetPacketTimestampLhdcV3(p_codec_info, p_data, p_timestamp);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorGetPacketTimestampLhdcV2(p_codec_info, p_data, p_timestamp);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorGetPacketTimestampLhdcV1(p_codec_info, p_data, p_timestamp);
+  }
+
   // Add checks based on <vendor_id, codec_id>
 
   return false;
@@ -467,6 +624,24 @@ bool A2DP_VendorBuildCodecHeader(const uint8_t* p_codec_info, BT_HDR* p_buf,
                                            frames_per_packet);
   }
 
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorBuildCodecHeaderLhdcV3(p_codec_info, p_buf,
+                                               frames_per_packet);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorBuildCodecHeaderLhdcV2(p_codec_info, p_buf,
+                                               frames_per_packet);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorBuildCodecHeaderLhdcV1(p_codec_info, p_buf,
+                                               frames_per_packet);
+  }
+
   // Add checks based on <vendor_id, codec_id>
 
   return false;
@@ -492,6 +667,18 @@ const tA2DP_ENCODER_INTERFACE* A2DP_VendorGetEncoderInterface(
   // Check for LDAC
   if (vendor_id == A2DP_LDAC_VENDOR_ID && codec_id == A2DP_LDAC_CODEC_ID) {
     return A2DP_VendorGetEncoderInterfaceLdac(p_codec_info);
+  }
+
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorGetEncoderInterfaceLhdcV3(p_codec_info);
+  }
+
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorGetEncoderInterfaceLhdcV2(p_codec_info);
+  }
+
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorGetEncoderInterfaceLhdcV1(p_codec_info);
   }
 
   // Add checks based on <vendor_id, codec_id>
@@ -536,6 +723,21 @@ bool A2DP_VendorAdjustCodec(uint8_t* p_codec_info) {
     return A2DP_VendorAdjustCodecLdac(p_codec_info);
   }
 
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorAdjustCodecLhdcV3(p_codec_info);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorAdjustCodecLhdcV2(p_codec_info);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorAdjustCodecLhdcV1(p_codec_info);
+  }
+
   // Add checks based on <vendor_id, codec_id>
 
   return false;
@@ -561,6 +763,18 @@ btav_a2dp_codec_index_t A2DP_VendorSourceCodecIndex(
   // Check for LDAC
   if (vendor_id == A2DP_LDAC_VENDOR_ID && codec_id == A2DP_LDAC_CODEC_ID) {
     return A2DP_VendorSourceCodecIndexLdac(p_codec_info);
+  }
+
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorSourceCodecIndexLhdcV3(p_codec_info);
+  }
+
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorSourceCodecIndexLhdcV2(p_codec_info);
+  }
+
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorSourceCodecIndexLhdcV1(p_codec_info);
   }
 
   // Add checks based on <vendor_id, codec_id>
@@ -599,6 +813,12 @@ const char* A2DP_VendorCodecIndexStr(btav_a2dp_codec_index_t codec_index) {
       return A2DP_VendorCodecIndexStrLdac();
     case BTAV_A2DP_CODEC_INDEX_SINK_LDAC:
       return A2DP_VendorCodecIndexStrLdacSink();
+    case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV3:
+      return A2DP_VendorCodecIndexStrLhdcV3();
+    case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV2:
+      return A2DP_VendorCodecIndexStrLhdcV2();
+    case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV1:
+      return A2DP_VendorCodecIndexStrLhdcV1();
     // Add a switch statement for each vendor-specific codec
     case BTAV_A2DP_CODEC_INDEX_MAX:
       break;
@@ -624,6 +844,12 @@ bool A2DP_VendorInitCodecConfig(btav_a2dp_codec_index_t codec_index,
       return A2DP_VendorInitCodecConfigLdac(p_cfg);
     case BTAV_A2DP_CODEC_INDEX_SINK_LDAC:
       return A2DP_VendorInitCodecConfigLdacSink(p_cfg);
+    case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV3:
+      return A2DP_VendorInitCodecConfigLhdcV3(p_cfg);
+    case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV2:
+      return A2DP_VendorInitCodecConfigLhdcV2(p_cfg);
+    case BTAV_A2DP_CODEC_INDEX_SOURCE_LHDCV1:
+      return A2DP_VendorInitCodecConfigLhdcV1(p_cfg);
     // Add a switch statement for each vendor-specific codec
     case BTAV_A2DP_CODEC_INDEX_MAX:
       break;
@@ -651,6 +877,21 @@ std::string A2DP_VendorCodecInfoString(const uint8_t* p_codec_info) {
   // Check for LDAC
   if (vendor_id == A2DP_LDAC_VENDOR_ID && codec_id == A2DP_LDAC_CODEC_ID) {
     return A2DP_VendorCodecInfoStringLdac(p_codec_info);
+  }
+
+  // Check for LHDCV3
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV3_CODEC_ID) {
+    return A2DP_VendorCodecInfoStringLhdcV3(p_codec_info);
+  }
+
+  // Check for LHDCV2
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV2_CODEC_ID) {
+    return A2DP_VendorCodecInfoStringLhdcV2(p_codec_info);
+  }
+
+  // Check for LHDCV1
+  if (vendor_id == A2DP_LHDC_VENDOR_ID && codec_id == A2DP_LHDCV1_CODEC_ID) {
+    return A2DP_VendorCodecInfoStringLhdcV1(p_codec_info);
   }
 
   // Add checks based on <vendor_id, codec_id>

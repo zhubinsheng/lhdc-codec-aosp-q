@@ -47,4 +47,17 @@ interface IBluetoothA2dp {
     int supportsOptionalCodecs(in BluetoothDevice device);
     int getOptionalCodecsEnabled(in BluetoothDevice device);
     oneway void setOptionalCodecsEnabled(in BluetoothDevice device, int value);
+    
+    //LHDC Extended Function: get current version of the target API and its configuration
+    int getLhdcCodecExtendAPIVer(in BluetoothDevice device, inout byte[] exApiVer);
+    
+    //LHDC Extended Function: config-type APIs
+    int setLhdcCodecExtendAPIConfigAR(in BluetoothDevice device, in byte[] codecConfig);
+    int getLhdcCodecExtendAPIConfigAR(in BluetoothDevice device, inout byte[] codecConfig);
+    int setLhdcCodecExtendAPIConfigMeta(in BluetoothDevice device, in byte[] codecConfig);
+    int getLhdcCodecExtendAPIConfigMeta(in BluetoothDevice device, inout byte[] codecConfig);   
+    int getLhdcCodecExtendAPIConfigA2dpCodecSpecific(in BluetoothDevice device, inout byte[] codecConfig);   
+        
+    //LHDC Extended Function: data-type APIs
+    oneway void setLhdcCodecExtendAPIDataGyro2D(in BluetoothDevice device, in byte[] codecData);    
 }

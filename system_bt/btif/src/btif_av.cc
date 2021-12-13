@@ -493,24 +493,28 @@ class BtifAvSource {
       const RawAddress& peer_address,
       const std::vector<btav_a2dp_codec_config_t>& codec_preferences,
       std::promise<void> peer_ready_promise) {
-    // Restart the session if the codec for the active peer is updated
-    bool restart_session =
-        ((active_peer_ == peer_address) && !active_peer_.IsEmpty());
-    if (restart_session) {
-      btif_a2dp_source_end_session(active_peer_);
-    }
 
-    for (auto cp : codec_preferences) {
-      BTIF_TRACE_DEBUG("%s: codec_preference=%s", __func__,
-                       cp.ToString().c_str());
-      btif_a2dp_source_encoder_user_config_update_req(peer_address, cp);
-    }
-    if (restart_session) {
-      btif_a2dp_source_start_session(active_peer_,
-                                     std::move(peer_ready_promise));
-    } else {
-      peer_ready_promise.set_value();
-    }
+    for (auto cp : codec_preferences)
+    {
+        // Restart the session if the codec for the active peer is updated
+        bool restart_session =
+            ((active_peer_ == peer_address) && !active_peer_.IsEmpty());
+
+        if (restart_session) {
+          btif_a2dp_source_end_session(active_peer_);
+        }
+
+        BTIF_TRACE_WARNING("%s: codec_preference=%s", __func__,
+            cp.ToString().c_str());
+        btif_a2dp_source_encoder_user_config_update_req(peer_address, cp);
+
+        if (restart_session) {
+          btif_a2dp_source_start_session(active_peer_, std::move(peer_ready_promise));
+        }
+        else {
+          peer_ready_promise.set_value();
+        }
+    }   /* end for */
   }
 
   const std::map<RawAddress, BtifAvPeer*>& Peers() const { return peers_; }
@@ -2819,6 +2823,96 @@ static bt_status_t codec_config_src(
   return status;
 }
 
+//LHDC Extended Function API Start
+static int lhdc_getApiVer_src(
+    const RawAddress& peer_address,
+    char* version, int clen) {
+
+  int status = BT_STATUS_NOT_READY;
+
+  BTIF_TRACE_EVENT("%s", __func__);
+
+  if (!btif_av_source.Enabled()) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source is not enabled";
+    return BT_STATUS_NOT_READY;
+  }
+
+  status = btif_a2dp_source_encoder_LHDC_user_ApiVer_retrieve_req(peer_address, version, clen);
+
+  if (status != BT_STATUS_SUCCESS) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source fails to config LHDC codec";
+  }
+
+  return status;
+}
+
+static int lhdc_getApiCfg_src(
+    const RawAddress& peer_address,
+    char* config, int clen) {
+
+  int status = BT_STATUS_NOT_READY;
+
+  BTIF_TRACE_EVENT("%s", __func__);
+
+  if (!btif_av_source.Enabled()) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source is not enabled";
+    return BT_STATUS_NOT_READY;
+  }
+
+  status = btif_a2dp_source_encoder_LHDC_user_config_retrieve_req(peer_address, config, clen);
+
+  if (status != BT_STATUS_SUCCESS) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source fails to config LHDC codec";
+  }
+
+  return status;
+}
+
+static int lhdc_setApiCfg_src(
+    const RawAddress& peer_address,
+    char* config, int clen) {
+
+  int status = BT_STATUS_NOT_READY;
+
+  BTIF_TRACE_EVENT("%s", __func__);
+
+  if (!btif_av_source.Enabled()) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source is not enabled";
+    return BT_STATUS_NOT_READY;
+  }
+
+  status = btif_a2dp_source_encoder_LHDC_user_config_update_req(peer_address, config, clen);
+
+  if (status != BT_STATUS_SUCCESS) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source fails to config LHDC codec";
+  }
+
+  return status;
+}
+
+static void lhdc_setApiData_src(
+    const RawAddress& peer_address,
+    char* data, int clen) {
+
+  BTIF_TRACE_EVENT("%s", __func__);
+
+  if (!btif_av_source.Enabled()) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source is not enabled";
+    return;
+  }
+
+  btif_av_codec_lhdc_api_data_t codec_data;
+  memcpy(&codec_data.bd_addr, (uint8_t *)&peer_address, sizeof(RawAddress));
+  codec_data.clen = clen;
+  codec_data.pData = data;
+
+  btif_transfer_context(btif_a2dp_source_encoder_LHDC_user_data_update_req, 0,
+                          (char *)&codec_data, sizeof(codec_data), NULL);
+
+  return;
+}
+//LHDC Extended Function API End
+
 static void cleanup_src(void) {
   BTIF_TRACE_EVENT("%s", __func__);
   do_in_main_thread(FROM_HERE, base::Bind(&BtifAvSource::Cleanup,
@@ -2840,6 +2934,10 @@ static const btav_source_interface_t bt_av_src_interface = {
     src_set_active_sink,
     codec_config_src,
     cleanup_src,
+    lhdc_getApiVer_src,
+    lhdc_getApiCfg_src,
+    lhdc_setApiCfg_src,
+    lhdc_setApiData_src,
 };
 
 static const btav_sink_interface_t bt_av_sink_interface = {

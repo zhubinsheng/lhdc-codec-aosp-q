@@ -387,6 +387,23 @@ class A2dpCodecs {
                           uint8_t* p_result_codec_config, bool* p_restart_input,
                           bool* p_restart_output, bool* p_config_updated);
 
+  //LHDC set/get user config or data
+  int getLHDCCodecUserApiVer(
+      const btav_a2dp_codec_index_t peerCodecIndex,
+      const char* codecConfig, const int clen);
+
+  int getLHDCCodecUserConfig(
+      const btav_a2dp_codec_index_t peerCodecIndex,
+      const char* codecConfig, const int clen);
+
+  int setLHDCCodecUserConfig(
+      const btav_a2dp_codec_index_t peerCodecIndex,
+      const char* codecConfig, const int clen);
+
+  bool setLHDCCodecUserData(
+      const btav_a2dp_codec_index_t peerCodecIndex,
+      const char* codecData, const int clen);
+
   // Sets the Audio HAL selected audio feeding parameters.
   // Those parameters are applied only to the currently selected codec.
   // |codec_audio_config| contains the selected audio feeding configuration.
