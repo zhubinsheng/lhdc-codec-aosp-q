@@ -34,6 +34,8 @@ import com.android.settingslib.core.lifecycle.LifecycleObserver;
 import com.android.settingslib.core.lifecycle.events.OnDestroy;
 import com.android.settingslib.development.DeveloperOptionsPreferenceController;
 
+import android.util.Log;
+
 public abstract class AbstractBluetoothA2dpPreferenceController extends
         DeveloperOptionsPreferenceController implements Preference.OnPreferenceChangeListener,
         PreferenceControllerMixin, BluetoothServiceConnectionListener, LifecycleObserver,
@@ -178,8 +180,60 @@ public abstract class AbstractBluetoothA2dpPreferenceController extends
     @VisibleForTesting
     void setCodecConfigPreference(BluetoothDevice device,
             BluetoothCodecConfig config) {
+
         mBluetoothA2dp.setCodecConfigPreference(device, config);
     }
+    
+    //LHDC Extended Function APIs Start
+    @VisibleForTesting
+    int getLhdcCodecExtendAPIVer(BluetoothDevice device,
+    		byte[] exApiVer) {
+        
+        return mBluetoothA2dp.getLhdcCodecExtendAPIVer(device, exApiVer);        
+    }
+    
+    @VisibleForTesting
+    int setLhdcCodecExtendAPIConfigAR(BluetoothDevice device,
+    		byte[] codecConfig) {
+        
+        return mBluetoothA2dp.setLhdcCodecExtendAPIConfigAR(device, codecConfig);        
+    }
+    
+    @VisibleForTesting
+    int getLhdcCodecExtendAPIConfigAR(BluetoothDevice device,
+    		byte[] codecConfig) {
+        
+        return mBluetoothA2dp.getLhdcCodecExtendAPIConfigAR(device, codecConfig);        
+    }
+    
+    @VisibleForTesting
+    int setLhdcCodecExtendAPIConfigMeta(BluetoothDevice device,
+    		byte[] codecConfig) {
+        
+        return mBluetoothA2dp.setLhdcCodecExtendAPIConfigMeta(device, codecConfig);        
+    }
+    
+    @VisibleForTesting
+    int getLhdcCodecExtendAPIConfigMeta(BluetoothDevice device,
+    		byte[] codecConfig) {
+        
+        return mBluetoothA2dp.getLhdcCodecExtendAPIConfigMeta(device, codecConfig);        
+    }    
+    
+    @VisibleForTesting
+    int getLhdcCodecExtendAPIConfigA2dpCodecSpecific(BluetoothDevice device,
+    		byte[] codecConfig) {
+        
+        return mBluetoothA2dp.getLhdcCodecExtendAPIConfigA2dpCodecSpecific(device, codecConfig);        
+    }
+    
+    @VisibleForTesting
+    void setLhdcCodecExtendAPIDataGyro2D(BluetoothDevice device,
+    		byte[] codecData) {
+        
+        mBluetoothA2dp.setLhdcCodecExtendAPIDataGyro2D(device, codecData);        
+    }
+    //LHDC Extended Function APIs End
 
     @VisibleForTesting
     BluetoothCodecConfig getCodecConfig(BluetoothDevice device) {
@@ -190,5 +244,6 @@ public abstract class AbstractBluetoothA2dpPreferenceController extends
             }
         }
         return null;
-    }
+    }   
+
 }

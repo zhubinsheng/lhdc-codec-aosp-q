@@ -325,6 +325,27 @@
             android:entryValues="@array/bluetooth_a2dp_codec_ldac_playback_quality_values" />
 
         <ListPreference
+            android:key="bluetooth_enable_a2dp_codec_lhdc_ar_effect"
+            android:title="@string/bluetooth_enable_a2dp_codec_lhdc_ar_effect"
+            android:dialogTitle="@string/bluetooth_enable_a2dp_codec_lhdc_ar_effect_dialog_title"
+            android:entries="@array/bluetooth_enable_a2dp_codec_lhdc_ar_effect_titles"
+            android:entryValues="@array/bluetooth_enable_a2dp_codec_lhdc_ar_effect_values" />
+    
+        <ListPreference
+            android:key="bluetooth_select_a2dp_lhdc_playback_quality"
+            android:title="@string/bluetooth_select_a2dp_codec_lhdc_playback_quality"
+            android:dialogTitle="@string/bluetooth_select_a2dp_codec_lhdc_playback_quality_dialog_title"
+            android:entries="@array/bluetooth_a2dp_codec_lhdc_playback_quality_titles"
+            android:entryValues="@array/bluetooth_a2dp_codec_lhdc_playback_quality_values" />
+                
+        <ListPreference
+            android:key="bluetooth_select_a2dp_codec_lhdc_latency"
+            android:title="@string/bluetooth_select_a2dp_codec_lhdc_latency"
+            android:dialogTitle="@string/bluetooth_select_a2dp_codec_lhdc_latency_dialog_title"
+            android:entries="@array/bluetooth_a2dp_codec_lhdc_latency_titles"
+            android:entryValues="@array/bluetooth_a2dp_codec_lhdc_latency_values" />
+
+        <ListPreference
             android:key="bluetooth_max_connected_audio_devices"
             android:title="@string/bluetooth_max_connected_audio_devices_string"
             android:dialogTitle="@string/bluetooth_max_connected_audio_devices_dialog_title"
