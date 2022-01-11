@@ -2492,7 +2492,6 @@ bool A2dpCodecConfigLhdcV3::setPeerCodecCapabilities(
         goto fail;
     }
 */
-    codec_selectable_capability_.codec_specific_3 = peer_info_cie.isLLSupported ? 1 : 0;
 
     // Compute the selectable capability - bits per sample
     //codec_selectable_capability_.bits_per_sample =
