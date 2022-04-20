@@ -16,6 +16,7 @@ typedef enum _lhdcBT_ext_func_field_t{
   LHDCBT_EXT_FUNC_EXTR,
   LHDCBT_EXT_FUNC_JAS,
   //LHDCBT_EXT_FUNC_META,
+  LHDCBT_EXT_FUNC_MAX,
 } lhdcBT_ext_func_field_t;
 
 //
@@ -354,19 +355,19 @@ int lhdcBT_get_bitrate(HANDLE_LHDC_BT hLhdcParam);
 
 int lhdcBT_set_bitrate(HANDLE_LHDC_BT handle, int bitrate_inx);
 
-int lhdcBT_get_sampling_freq(HANDLE_LHDC_BT handle);
+//int lhdcBT_get_sampling_freq(HANDLE_LHDC_BT handle);
 
-int lhdcBT_init_handle_encode(HANDLE_LHDC_BT handle,int sampling_freq, int bitPerSample, int bitrate_inx, int dualChannel, int need_padding, int mtu, int interval);
+//int lhdcBT_init_handle_encode(HANDLE_LHDC_BT handle,int sampling_freq, int bitPerSample, int bitrate_inx, int dualChannel, int need_padding, int mtu, int interval);
 
-int lhdcBT_get_error_code(HANDLE_LHDC_BT handle);
+//int lhdcBT_get_error_code(HANDLE_LHDC_BT handle);
 
 int lhdcBT_adjust_bitrate(HANDLE_LHDC_BT handle, size_t queueLength) ;
 
-void lhdcBT_setLimitBitRate(HANDLE_LHDC_BT handle, int max_rate_index);
+//void lhdcBT_setLimitBitRate(HANDLE_LHDC_BT handle, int max_rate_index);
 
-uint8_t lhdcBT_getSupportedVersion(HANDLE_LHDC_BT handle);
+//uint8_t lhdcBT_getSupportedVersion(HANDLE_LHDC_BT handle);
 
-int     lhdcBT_getBlockSize(HANDLE_LHDC_BT handle);
+int     lhdcBT_get_block_Size(HANDLE_LHDC_BT handle);
 
 int lhdcBT_set_ext_func_state(HANDLE_LHDC_BT handle, lhdcBT_ext_func_field_t field, bool enabled, void * priv, int priv_data_len);
 
@@ -376,25 +377,13 @@ int lhdcBT_get_ext_func_state(HANDLE_LHDC_BT handle, lhdcBT_ext_func_field_t fie
 // Extra API
 //
 // 1. API -- Set User Config (Extend)
-//int lhdcBT_set_user_exconfig(HANDLE_LHDC_BT handle, const char *userConfig, const int configLen);
-int lhdcBT_set_user_exconfig(HANDLE_LHDC_BT handle, const char* userConfig, const int clen);
+int lhdcBT_set_user_exconfig(HANDLE_LHDC_BT handle, char* userConfig, int clen);
 // 2. API -- Get User Config (Extend)
-//int lhdcBT_get_user_exconfig(HANDLE_LHDC_BT handle, char *userConfig, const int configLen);
 int lhdcBT_get_user_exconfig(HANDLE_LHDC_BT handle, char* userConfig, int clen);
 // 3. API -- Set User Data (Extend)
-//int lhdcBT_set_user_exdata(HANDLE_LHDC_BT handle, const char *userData, const int dataLen);
-void lhdcBT_set_user_exdata(HANDLE_LHDC_BT handle, const char* userConfig, const int clen);
+void lhdcBT_set_user_exdata(HANDLE_LHDC_BT handle, char* userConfig, int clen);
 // 4. API -- Get Version 
-//int lhdcBT_get_ex_api_ver(HANDLE_LHDC_BT handle, const char *exApiVer, const int verLen);
-int lhdcBT_get_user_exconfigver(HANDLE_LHDC_BT handle, char *userConfig, int clen);
-
-
-
-//int lhdcBT_get_user_exconfigver(HANDLE_LHDC_BT handle, char *userConfig, int clen);
-//int lhdcBT_get_user_exconfig(HANDLE_LHDC_BT handle, char* userConfig, int clen);
-//int lhdcBT_set_user_exconfig(HANDLE_LHDC_BT handle, const char* userConfig, const int clen);
-//void lhdcBT_set_user_exdata(HANDLE_LHDC_BT handle, const char* userConfig, const int clen);
-
+int lhdcBT_get_user_exApiver(HANDLE_LHDC_BT handle, char *version, int clen);
 
 #endif
 #ifdef __cplusplus

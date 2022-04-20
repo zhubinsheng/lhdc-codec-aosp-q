@@ -33,7 +33,7 @@
 /* 256kbps, 192kbps, 128kbps, 96kbps, 64kbps */
 #define A2DP_LHDC_QUALITY_ABR    8   // ABR mode, range: 990,660,492,396,330(kbps)
 #define A2DP_LHDC_QUALITY_HIGH   7  // Equal to LHDCBT_EQMID_HQ 900kbps
-#define A2DP_LHDC_QUALITY_MID    6   // Equal to LHDCBT_EQMID_SQ 600kbps
+#define A2DP_LHDC_QUALITY_MID    6   // Equal to LHDCBT_EQMID_SQ 500kbps
 #define A2DP_LHDC_QUALITY_LOW    5   // Equal to LHDCBT_EQMID_MQ 400kbps
 #define A2DP_LHDC_QUALITY_LOW4   4   // 320
 #define A2DP_LHDC_QUALITY_LOW3   3   // 256
@@ -121,7 +121,7 @@ typedef enum {
 //[Octet 7:bit4..bit5]
 #define A2DP_LHDC_MAX_BIT_RATE_MASK       0x30
 #define A2DP_LHDC_MAX_BIT_RATE_900K       0x00
-#define A2DP_LHDC_MAX_BIT_RATE_500K       0x10		//500~600K
+#define A2DP_LHDC_MAX_BIT_RATE_500K       0x10		//500K
 #define A2DP_LHDC_MAX_BIT_RATE_400K       0x20
 //[Octet 7:bit6]
 #define A2DP_LHDC_LL_MASK             0x40
@@ -151,7 +151,7 @@ typedef enum {
 #define A2DP_LHDC_CHANNEL_MODE_STEREO 0x01
 
 #define A2DP_LHDC_BITRATE_900K		0x01
-#define A2DP_LHDC_BITRATE_600K		0x02
+#define A2DP_LHDC_BITRATE_500K		0x02
 #define A2DP_LHDC_BITRATE_400K		0x04
 #define A2DP_LHDC_BITRATE_320K		0x08
 #define A2DP_LHDC_BITRATE_256K		0x10

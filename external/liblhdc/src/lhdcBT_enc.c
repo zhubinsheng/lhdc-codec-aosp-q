@@ -372,10 +372,15 @@ void lhdcBT_free_handle(HANDLE_LHDC_BT handle) {
 
 
 HANDLE_LHDC_BT lhdcBT_get_handle(int version){
-    lhdc_cb_t * lhdcBT = (lhdc_cb_t *)malloc(sizeof(lhdc_cb_t));
-
-    memset(lhdcBT, 0 , sizeof(lhdc_cb_t));
     ALOGD("%s: Version number %d", __func__, version);
+
+    if(version <= 0)
+    {
+      return NULL;
+    }
+
+    lhdc_cb_t * lhdcBT = (lhdc_cb_t *)malloc(sizeof(lhdc_cb_t));
+    memset(lhdcBT, 0 , sizeof(lhdc_cb_t));
 
 #ifdef AR_ALWAYS_ON
     lhdcBT->ar_filter = ar_process_new();
@@ -401,15 +406,60 @@ HANDLE_LHDC_BT lhdcBT_get_handle(int version){
 
     return lhdcBT;
 }
-int lhdcBT_init_encoder(HANDLE_LHDC_BT handle,int sampling_freq, int bitPerSample, int bitrate_inx, int dualChannel, int need_padding, int mtu, int interval) {
+int lhdcBT_init_encoder(HANDLE_LHDC_BT handle,int sampling_freq, int bitPerSample, int bitrate_inx,
+    int dualChannel, int need_padding, int mtu, int interval) {
+
     int result = 0;
     unsigned int samples_per_frame = 0;
     lhdc_cb_t * lhdcBT = (lhdc_cb_t *)handle;
     if (!lhdcBT)
     {
         ALOGE("%s: Handle is NULL!!!", __func__);
-        return 0;
+        return -1;
     }
+
+    if (sampling_freq != 44100 && sampling_freq != 48000 && sampling_freq != 96000)
+    {
+      ALOGE("%s: Invalid Sample Rate (%d)!!!", __func__, sampling_freq);
+      return -1;
+    }
+
+    if (bitPerSample != LHDCBT_SMPL_FMT_S16 && bitPerSample != LHDCBT_SMPL_FMT_S24)
+    {
+      ALOGE("%s: Invalid Bit Per Sample (%d)!!!", __func__, bitPerSample);
+      return -1;
+    }
+
+    if (bitrate_inx < LHDCBT_QUALITY_LOW0 || bitrate_inx >= LHDCBT_QUALITY_MAX)
+    {
+      ALOGE("%s: invalid bit rate index (%d)!!!", __func__, bitrate_inx);
+      return -1;
+    }
+
+    if (dualChannel != 0 && dualChannel != 1)
+    {
+      ALOGE("%s: invalid Channel mode (%d)!!!", __func__, dualChannel);
+      return -1;
+    }
+
+    if (need_padding != 0)
+    {
+      ALOGE("%s: invalid need padding (%d)!!!", __func__, need_padding);
+      return -1;
+    }
+
+    if (mtu <= 0 || mtu >= 4096 )
+    {
+      ALOGE("%s: invalid mtu (%d)!!!", __func__, mtu);
+      return -1;
+    }
+
+    if (interval <= 0 || interval > 20) //default: 10ms or 20ms
+    {
+      ALOGE("%s: invalid interval (%d)!!!", __func__, interval);
+      return -1;
+    }
+
     enc_t * enc = &lhdcBT->enc;
 
     switch(lhdcBT->enc_type){
@@ -441,6 +491,11 @@ void lhdcBT_set_max_bitrate(HANDLE_LHDC_BT handle, int max_rate_index) {
         ALOGE("%s: Handle is NULL!!!", __func__);
         return;
     }
+    if (max_rate_index < LHDCBT_QUALITY_LOW0 || max_rate_index >= LHDCBT_QUALITY_MAX)
+    {
+      ALOGE("%s: invalid bit rate index (%d)!!!", __func__, max_rate_index);
+      return;
+    }
     enc_t * enc = &lhdcBT->enc;
 
     switch(lhdcBT->enc_type){
@@ -465,6 +520,16 @@ int lhdcBT_encode(HANDLE_LHDC_BT handle, void* p_pcm, unsigned char* p_stream){
         ALOGE("%s: Handle is NULL!!!", __func__);
         return -1;
     }
+    if (!p_pcm)
+    {
+        ALOGE("%s: p_pcm is NULL!!!", __func__);
+        return -1;
+    }
+    if (!p_stream)
+    {
+        ALOGE("%s: p_stream is NULL!!!", __func__);
+        return -1;
+    }
     enc_t * enc = &lhdcBT->enc;
 
     switch(lhdcBT->enc_type){
@@ -475,16 +540,44 @@ int lhdcBT_encode(HANDLE_LHDC_BT handle, void* p_pcm, unsigned char* p_stream){
 
             //return llac_encoder_init(enc->llac, sampling_freq, bitPerSample, bitrate_inx, mtu, interval);
             ALOGD("%s: LLAC not supported", __func__);
+            break;
         }
         default:
-        break;
+          break;;
     }
-    return 0;
+    return -1;
 }
 
 
-int lhdcBT_encodeV3(HANDLE_LHDC_BT handle, void* p_pcm, unsigned char* out_put, uint32_t * written, uint32_t * out_fraems){
-    return lhdc_util_encv4_process( handle, p_pcm, out_put, written, out_fraems);
+int lhdcBT_encodeV3(HANDLE_LHDC_BT handle, void* p_pcm, unsigned char* out_put, uint32_t * written, uint32_t * out_frames){
+    lhdc_cb_t * lhdcBT = (lhdc_cb_t *)handle;
+    if (!lhdcBT)
+    {
+        ALOGE("%s: Handle is NULL!!!", __func__);
+        return -1;
+    }
+    if (p_pcm == NULL)
+    {
+        ALOGE("%s: input pcm buffer ptr is NULL!!!", __func__);
+        return -1;
+    }
+    if (out_put == NULL)
+    {
+        ALOGE("%s: output pcm buffer ptr is NULL!!!", __func__);
+        return -1;
+    }
+    if (written == NULL)
+    {
+        ALOGE("%s: written address is NULL!!!", __func__);
+        return -1;
+    }
+    if (out_frames == NULL)
+    {
+        ALOGE("%s: out_frames address is NULL!!!", __func__);
+        return -1;
+    }
+
+    return lhdc_util_encv4_process( handle, p_pcm, out_put, written, out_frames);
 }
 
 
@@ -531,9 +624,9 @@ int lhdcBT_get_bitrate(HANDLE_LHDC_BT handle) {
             return llac_encoder_get_target_bitrate(enc->llac);  //llac_encoder_encode(enc->llac, p_pcm, out_put, written, out_fraems);
         }
         default:
-        break;
+          break;
     }
-    return 0;
+    return -1;
 }
 
 
@@ -546,6 +639,13 @@ int lhdcBT_set_bitrate(HANDLE_LHDC_BT handle, int bitrate_inx){
         ALOGE("%s: Handle is NULL!!!", __func__);
         return -1;
     }
+
+    if(bitrate_inx < LHDCBT_QUALITY_LOW0 || bitrate_inx >= LHDCBT_QUALITY_MAX)
+    {
+      ALOGE("%s: invalid bit rate index (%d)!!!", __func__, bitrate_inx);
+      return -1;
+    }
+
     enc_t * enc = &lhdcBT->enc;
 
     switch(lhdcBT->enc_type){
@@ -556,9 +656,10 @@ int lhdcBT_set_bitrate(HANDLE_LHDC_BT handle, int bitrate_inx){
 
             //return llac_encoder_init(enc->llac, sampling_freq, bitPerSample, bitrate_inx, mtu, interval);
             ALOGD("%s: LLAC not supported", __func__);
+            return -1;
         }
         default:
-        break;
+          break;
     }
     return -1;
 }
@@ -571,6 +672,12 @@ int lhdcBT_adjust_bitrate(HANDLE_LHDC_BT handle, size_t queueLen) {
     if (!lhdcBT)
     {
         ALOGE("%s: Handle is NULL!!!", __func__);
+        return -1;
+    }
+
+    if (queueLen < 0)
+    {
+        ALOGE("%s: Invalid queue Len (%zu)!!!", __func__, queueLen);
         return -1;
     }
     enc_t * enc = &lhdcBT->enc;
@@ -588,11 +695,17 @@ int lhdcBT_adjust_bitrate(HANDLE_LHDC_BT handle, size_t queueLen) {
     return -1;
 }
 
-int lhdcBT_set_ext_func_state(HANDLE_LHDC_BT handle, lhdcBT_ext_func_field_t field, bool enabled, void * priv, int priv_data_len){
+int lhdcBT_set_ext_func_state(HANDLE_LHDC_BT handle, lhdcBT_ext_func_field_t field, bool enabled,
+    void * priv /*nullable*/, int priv_data_len){
     lhdc_cb_t * lhdcBT = (lhdc_cb_t *)handle;
     if (!lhdcBT)
     {
         ALOGE("%s: Handle is NULL!!!", __func__);
+        return -1;
+    }
+    if (field < LHDCBT_EXT_FUNC_AR || field >= LHDCBT_EXT_FUNC_MAX)
+    {
+        ALOGE("%s: invalid field (%d) !!!", __func__, field);
         return -1;
     }
     enc_t * enc = &lhdcBT->enc;
@@ -607,23 +720,30 @@ int lhdcBT_set_ext_func_state(HANDLE_LHDC_BT handle, lhdcBT_ext_func_field_t fie
                 case EXT_FUNC_AR:
                 LhdcExtFuncArEnable(enc->lhdc->fft_blk, enabled ? 1 : 0);
                 ALOGD("%s: lhdc AR func = %d", __func__, enabled);
+                return 0;
                 break;
+
                 case EXT_FUNC_JAS:
                 LhdcExtFuncJasEnable(enc->lhdc->fft_blk, enabled ? 1 : 0);
                 ALOGD("%s: lhdc JAS func = %d", __func__, enabled);
+                return 0;
                 break;
+
                 case EXT_FUNC_META:
                 if (!priv || !priv_data_len) {
                     return -1;
                 }
                 LhdcExtFuncMetaEnable(enc->lhdc->fft_blk, enabled ? 1 : 0, priv, priv_data_len, 8);
                 ALOGD("%s: lhdc Meta func = %d", __func__, enabled);
+                return 0;
                 break;
+
                 default:
                 break;
             }
         }
         break;
+
         case ENC_TYPE_LLAC:
         {
             int8_t f_inx =  -1;
@@ -632,9 +752,11 @@ int lhdcBT_set_ext_func_state(HANDLE_LHDC_BT handle, lhdcBT_ext_func_field_t fie
                 case EXT_FUNC_AR:
                 f_inx = EXTRA_FUNC_AR;
                 break;
+
                 case EXT_FUNC_LARC:
                 f_inx = EXTRA_FUNC_LARC;
                 break;
+
                 default:
                 break;
             }
@@ -644,14 +766,16 @@ int lhdcBT_set_ext_func_state(HANDLE_LHDC_BT handle, lhdcBT_ext_func_field_t fie
                 llac_enc_set_extra_func(f_inx,
                                         f_enbaled,
                                         enc->llac->lh4_enc);
+                return 0;
             }
-            
         }
         break;
+
         default:
         break;
     }
-    return 0;
+
+    return -1;
 }
 
 int lhdcBT_get_ext_func_state(HANDLE_LHDC_BT handle, lhdcBT_ext_func_field_t field, bool * enabled){
@@ -659,6 +783,11 @@ int lhdcBT_get_ext_func_state(HANDLE_LHDC_BT handle, lhdcBT_ext_func_field_t fie
     if (!lhdcBT)
     {
         ALOGE("%s: Handle is NULL!!!", __func__);
+        return -1;
+    }
+    if (!enabled)
+    {
+        ALOGE("%s: enabled is NULL!!!", __func__);
         return -1;
     }
     enc_t * enc = &lhdcBT->enc;
@@ -675,7 +804,6 @@ int lhdcBT_set_hasMinBitrateLimit(HANDLE_LHDC_BT handle, bool enabled ){
         ALOGE("%s: Handle is NULL!!!", __func__);
         return -1;
     }
-
     enc_t * enc = &lhdcBT->enc;
 
 
@@ -1068,8 +1196,7 @@ static int lhdcBT_get_cfg_ar_v1(HANDLE_LHDC_BT handle, char *userConfig, const i
 */
 
 // 1. API -- Set User Config (Extend)
-//int lhdcBT_set_user_exconfig(HANDLE_LHDC_BT handle, const char *userConfig, const int configLen) {
-int lhdcBT_set_user_exconfig(HANDLE_LHDC_BT handle, const char* userConfig, const int clen) {
+int lhdcBT_set_user_exconfig(HANDLE_LHDC_BT handle, char* userConfig, int clen) {
 
     unsigned char *pucConfig = (unsigned char *) userConfig;
     unsigned int exFuncVer;
@@ -1143,7 +1270,6 @@ int lhdcBT_set_user_exconfig(HANDLE_LHDC_BT handle, const char* userConfig, cons
 
 
 // 2. API -- Get User Config (Extend)
-//int lhdcBT_get_user_exconfig(HANDLE_LHDC_BT handle, char *userConfig, const int configLen) {
 int lhdcBT_get_user_exconfig(HANDLE_LHDC_BT handle, char* userConfig, int clen) {
 
 
@@ -1219,9 +1345,8 @@ int lhdcBT_get_user_exconfig(HANDLE_LHDC_BT handle, char* userConfig, int clen) 
 
 }
 
-
 // 3. API -- Set User Data (Extend)
-void lhdcBT_set_user_exdata(HANDLE_LHDC_BT handle, const char* userData, const int clen) {
+void lhdcBT_set_user_exdata(HANDLE_LHDC_BT handle, char* userData, int clen) {
 
     unsigned char *pucData = (unsigned char *) userData;
     unsigned int exFuncVer;

@@ -711,7 +711,17 @@ static void a2dp_lhdcv3_get_num_frame_iteration(uint8_t* num_of_iterations,
   uint32_t result = 0;
   uint8_t nof = 0;
   uint8_t noi = 1;
-  uint32_t pcm_bytes_per_frame = lhdc_get_block_size(a2dp_lhdc_encoder_cb.lhdc_handle) *
+
+  *num_of_iterations = 0;
+  *num_of_frames = 0;
+
+  int32_t pcm_bytes_per_frame = lhdc_get_block_size(a2dp_lhdc_encoder_cb.lhdc_handle);
+  if (pcm_bytes_per_frame <= 0) {
+    LOG_DEBUG(LOG_TAG, "%s: lhdc_get_block_size error!", __func__);
+    return;
+  }
+
+  pcm_bytes_per_frame = pcm_bytes_per_frame *
   a2dp_lhdc_encoder_cb.feeding_params.channel_count *
   a2dp_lhdc_encoder_cb.feeding_params.bits_per_sample / 8;
   LOG_DEBUG(LOG_TAG, "%s: pcm_bytes_per_frame %u", __func__, pcm_bytes_per_frame);
@@ -758,6 +768,11 @@ static void a2dp_lhdcV3_encode_frames(uint8_t nb_frame){
   //tA2DP_LHDC_ENCODER_PARAMS* p_encoder_params =
   //    &a2dp_lhdc_encoder_cb.lhdc_encoder_params;
   int32_t samples_per_frame = lhdc_get_block_size(a2dp_lhdc_encoder_cb.lhdc_handle);
+  if (samples_per_frame <= 0) {
+    LOG_ERROR (LOG_TAG, "%s: lhdc_get_block_size error!", __func__);
+    return;
+  }
+
   uint32_t pcm_bytes_per_frame = samples_per_frame *
                                  a2dp_lhdc_encoder_cb.feeding_params.channel_count *
                                  a2dp_lhdc_encoder_cb.feeding_params.bits_per_sample / 8;
@@ -875,8 +890,14 @@ static void a2dp_lhdcV3_encode_frames(uint8_t nb_frame){
 }
 
 static bool a2dp_lhdcv3_read_feeding(uint8_t* read_buffer, uint32_t *bytes_read) {
-    uint32_t bytes_per_sample = a2dp_lhdc_encoder_cb.feeding_params.channel_count * a2dp_lhdc_encoder_cb.feeding_params.bits_per_sample / 8;
-    uint32_t read_size = lhdc_get_block_size(a2dp_lhdc_encoder_cb.lhdc_handle) * bytes_per_sample;
+  uint32_t bytes_per_sample = a2dp_lhdc_encoder_cb.feeding_params.channel_count * a2dp_lhdc_encoder_cb.feeding_params.bits_per_sample / 8;
+  uint32_t read_size = 0;
+  int32_t read_size_tmp = lhdc_get_block_size(a2dp_lhdc_encoder_cb.lhdc_handle);
+  if (read_size_tmp <= 0) {
+    LOG_ERROR (LOG_TAG, "%s: lhdc_get_block_size error!", __func__);
+    return false;
+  }
+  read_size = read_size_tmp * bytes_per_sample;
 
   a2dp_lhdc_encoder_cb.stats.media_read_total_expected_reads_count++;
   a2dp_lhdc_encoder_cb.stats.media_read_total_expected_read_bytes += read_size;
