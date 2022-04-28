@@ -1,9 +1,19 @@
 Release Note.
 =========================================================
+2022/04/19
+1. Upgrade 3DAR engine
+2. Add input parameter validation checking in Codec APIs
+3. Upgrade for R15p7
+
+2021/12/24
+1. Fix a bug that UI cannot switch codec from LHDC to SBC
+2. Upgrade for R15p6
+
 2021/11/15
 1. Add to print LHDC version and build time.
 2. Fix wrong AR effect.
 3. Fix when running LLAC, BT may crash after toggling AR UI on/off.
+4. Upgrade for R15p4
 
 2021/7/21
 Modify the calculation method to correct the number of frames per packet.
