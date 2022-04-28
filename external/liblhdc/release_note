@@ -3,7 +3,8 @@ Release Note.
 2022/04/19
 1. Upgrade 3DAR engine
 2. Add input parameter validation checking in Codec APIs
-3. Upgrade for R15p7
+3. Change Audio Quality Step 600kbps -> 500kbps
+4. Upgrade for R15p7
 
 2021/12/24
 1. Fix a bug that UI cannot switch codec from LHDC to SBC
