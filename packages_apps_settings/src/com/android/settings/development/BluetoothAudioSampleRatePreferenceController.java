@@ -76,6 +76,12 @@ public class BluetoothAudioSampleRatePreferenceController extends
             case 4:
                 sampleRateValue = BluetoothCodecConfig.SAMPLE_RATE_96000;
                 break;
+            case 5:	// Savitech Patch
+                sampleRateValue = BluetoothCodecConfig.SAMPLE_RATE_176400;
+                break;
+            case 6: // Savitech Patch
+                sampleRateValue = BluetoothCodecConfig.SAMPLE_RATE_192000;
+                break;
             default:
                 break;
         }
@@ -99,8 +105,12 @@ public class BluetoothAudioSampleRatePreferenceController extends
             case BluetoothCodecConfig.SAMPLE_RATE_96000:
                 index = 4;
                 break;
-            case BluetoothCodecConfig.SAMPLE_RATE_176400:
-            case BluetoothCodecConfig.SAMPLE_RATE_192000:
+            case BluetoothCodecConfig.SAMPLE_RATE_176400:	// Savitech Patch
+                index = 5;
+                break;
+            case BluetoothCodecConfig.SAMPLE_RATE_192000:	// Savitech Patch
+                index = 6;
+                break;
             case BluetoothCodecConfig.SAMPLE_RATE_NONE:
             default:
                 break;

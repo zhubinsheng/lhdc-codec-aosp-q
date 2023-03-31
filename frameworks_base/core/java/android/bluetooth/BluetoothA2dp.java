@@ -619,7 +619,8 @@ public final class BluetoothA2dp implements BluetoothProfile {
     @UnsupportedAppUsage
     public void setCodecConfigPreference(BluetoothDevice device,
                                          BluetoothCodecConfig codecConfig) {
-        if (DBG) Log.d(TAG, "setCodecConfigPreference(" + device + ")");
+        if (DBG) Log.d(TAG, "setCodecConfigPreference(" + device + ")");        
+       
         try {
             final IBluetoothA2dp service = getService();
             if (service != null && isEnabled()) {
@@ -632,6 +633,110 @@ public final class BluetoothA2dp implements BluetoothProfile {
             return;
         }
     }
+    
+    //Savitech Patch - LHDC Extended Function APIs Start
+    public int getLhdcCodecExtendAPIVer(BluetoothDevice device, 
+									byte[] exApiVer) {
+        try {
+            final IBluetoothA2dp service = getService();
+            if (service != null && isEnabled()) {
+                return service.getLhdcCodecExtendAPIVer(device, exApiVer);            	    
+            }
+            if (service == null) Log.w(TAG, "Proxy not attached to service");
+            return -1;
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error talking to BT service", e);
+            return -1;
+        }
+    }
+    
+    public int setLhdcCodecExtendAPIConfigAR(BluetoothDevice device, 
+									byte[] codecConfig) {
+        try {
+            final IBluetoothA2dp service = getService();
+            if (service != null && isEnabled()) {
+                return service.setLhdcCodecExtendAPIConfigAR(device, codecConfig);            	    
+            }
+            if (service == null) Log.w(TAG, "Proxy not attached to service");
+            return -1;
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error talking to BT service", e);
+            return -1;
+        }
+    }
+    
+    public int getLhdcCodecExtendAPIConfigAR(BluetoothDevice device, 
+									byte[] codecConfig) {
+        try {
+            final IBluetoothA2dp service = getService();
+            if (service != null && isEnabled()) {
+                return service.getLhdcCodecExtendAPIConfigAR(device, codecConfig);            	    
+            }
+            if (service == null) Log.w(TAG, "Proxy not attached to service");
+            return -1;
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error talking to BT service", e);
+            return -1;
+        }
+    }    
+
+	public int setLhdcCodecExtendAPIConfigMeta(BluetoothDevice device, 
+									byte[] codecConfig) {
+        try {
+            final IBluetoothA2dp service = getService();
+            if (service != null && isEnabled()) {
+                return service.setLhdcCodecExtendAPIConfigMeta(device, codecConfig);            	    
+            }
+            if (service == null) Log.w(TAG, "Proxy not attached to service");
+            return -1;
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error talking to BT service", e);
+            return -1;
+        }
+    }
+    
+    public int getLhdcCodecExtendAPIConfigMeta(BluetoothDevice device, 
+									byte[] codecConfig) {
+        try {
+            final IBluetoothA2dp service = getService();
+            if (service != null && isEnabled()) {
+                return service.getLhdcCodecExtendAPIConfigMeta(device, codecConfig);            	    
+            }
+            if (service == null) Log.w(TAG, "Proxy not attached to service");
+            return -1;
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error talking to BT service", e);
+            return -1;
+        }
+    }
+    
+    public int getLhdcCodecExtendAPIConfigA2dpCodecSpecific(BluetoothDevice device, 
+									byte[] codecConfig) {
+        try {
+            final IBluetoothA2dp service = getService();
+            if (service != null && isEnabled()) {
+                return service.getLhdcCodecExtendAPIConfigA2dpCodecSpecific(device, codecConfig);            	    
+            }
+            if (service == null) Log.w(TAG, "Proxy not attached to service");
+            return -1;
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error talking to BT service", e);
+            return -1;
+        }
+    }    
+    
+	public void setLhdcCodecExtendAPIDataGyro2D(BluetoothDevice device, 
+									byte[] codecData) {
+        try {
+            final IBluetoothA2dp service = getService();
+            if (service != null && isEnabled()) {
+                service.setLhdcCodecExtendAPIDataGyro2D(device, codecData);            	    
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error talking to BT service", e);
+        }
+    }
+    //Savitech Patch - LHDC Extended Function APIs End
 
     /**
      * Enables the optional codecs.

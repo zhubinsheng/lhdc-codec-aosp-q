@@ -200,6 +200,20 @@ class A2dpCodecConfig {
   virtual bool setPeerCodecCapabilities(
       const uint8_t* p_peer_codec_capabilities) = 0;
 
+  // Savitech Patch - LHDC Extended API Start
+  virtual int getLhdcExtendAPIVersion(
+      A2dpCodecConfig* peerCodec, const char* buf, const int clen) { return 0; }
+
+  virtual int getLhdcExtendAPIConfig(
+      A2dpCodecConfig* peerCodec, const char* buf, const int clen) { return 0; }
+
+  virtual int setLhdcExtendAPIConfig(
+      A2dpCodecConfig* peerCodec, const char* buf, const int clen) { return 0; }
+
+  virtual bool setLhdcExtendAPIData(
+      A2dpCodecConfig* peerCodec, const char* buf, const int clen) { return true; }
+  // Savitech Patch - LHDC Extended API End
+
   // Constructor where |codec_index| is the unique index that identifies the
   // codec. The user-friendly name is |name|.
   // The default codec priority is |codec_priority|. If the value is
@@ -386,6 +400,24 @@ class A2dpCodecs {
                           const uint8_t* p_peer_sink_capabilities,
                           uint8_t* p_result_codec_config, bool* p_restart_input,
                           bool* p_restart_output, bool* p_config_updated);
+
+  // Savitech Patch - LHDC Extended API Start
+  int getLHDCCodecUserApiVer(
+      A2dpCodecConfig* peerCodec,
+      const char* codecConfig, const int clen);
+
+  int getLHDCCodecUserConfig(
+      A2dpCodecConfig* peerCodec,
+      const char* codecConfig, const int clen);
+
+  int setLHDCCodecUserConfig(
+      A2dpCodecConfig* peerCodec,
+      const char* codecConfig, const int clen);
+
+  bool setLHDCCodecUserData(
+      A2dpCodecConfig* peerCodec,
+      const char* codecData, const int clen);
+  // Savitech Patch - LHDC Extended API End
 
   // Sets the Audio HAL selected audio feeding parameters.
   // Those parameters are applied only to the currently selected codec.

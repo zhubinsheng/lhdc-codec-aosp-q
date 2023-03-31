@@ -103,7 +103,15 @@ public class Config {
     };
 
     private static Class[] sSupportedProfiles = new Class[0];
-
+    
+    // Savitech Patch - A2DP_Sink_ON_OFF_switch
+    private static boolean isBluetoothPersistedA2DPSinkOn(Context context) {
+    	final ContentResolver resolver = context.getContentResolver();
+        int state = Settings.Global.getInt(resolver, Settings.Global.BLUETOOTH_A2DPSINK, 0);
+        Log.d(TAG, "persisted A2DP Sink state: " + state);
+        return (state != 0);
+    }
+    
     static void init(Context ctx) {
         if (ctx == null) {
             return;
@@ -121,6 +129,19 @@ public class Config {
                                 .isEnabled(ctx, FeatureFlagUtils.HEARING_AID_SETTINGS)) {
                 Log.v(TAG, "Feature Flag enables support for HearingAidService");
                 supported = true;
+            }
+            
+            /* Savitech Patch - A2DP_Sink_ON_OFF_switch
+             * 	check a2dp sink persisted variable to toggle A2DP sink profile
+             * */
+            if (supported == true && config.mClass == A2dpSinkService.class) {
+            	if (isBluetoothPersistedA2DPSinkOn(ctx)) {
+            		Log.d(TAG, "A2DP Sink UI Switch State: On!");
+            		supported = true;
+            	} else {
+            		Log.d(TAG, "A2DP Sink UI Switch State: Off!");
+            		supported = false;
+            	}
             }
 
             if (supported && !isProfileDisabled(ctx, config.mMask)) {

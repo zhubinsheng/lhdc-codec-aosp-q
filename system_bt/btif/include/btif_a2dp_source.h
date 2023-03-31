@@ -91,6 +91,24 @@ void btif_a2dp_source_encoder_user_config_update_req(
     const RawAddress& peer_addr,
     const btav_a2dp_codec_config_t& codec_user_config);
 
+
+// Savitech Patch - LHDC Extended API - Start
+int btif_a2dp_source_encoder_LHDC_user_ApiVer_retrieve_req(
+    const RawAddress& peer_addr,
+    const char *config, const int clen);
+
+int btif_a2dp_source_encoder_LHDC_user_config_retrieve_req(
+    const RawAddress& peer_addr,
+    const char *config, const int clen);
+
+int btif_a2dp_source_encoder_LHDC_user_config_update_req(
+    const RawAddress& peer_addr,
+    const char *config, const int clen);
+
+void btif_a2dp_source_encoder_LHDC_user_data_update_req(
+		uint16_t event, char* p_param);
+// Savitech Patch - LHDC Extended API - End
+
 // Process a request to update the A2DP audio encoding with new audio
 // configuration feeding parameters stored in |codec_audio_config|.
 // The fields that are used are: |codec_audio_config.sample_rate|,

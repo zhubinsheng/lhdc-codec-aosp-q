@@ -76,7 +76,8 @@
 #endif
 
 #ifndef BTA_AV_SINK_INCLUDED
-#define BTA_AV_SINK_INCLUDED FALSE
+//#define BTA_AV_SINK_INCLUDED FALSE
+#define BTA_AV_SINK_INCLUDED TRUE   // Savitech Patch - A2DP_Sink_Enable
 #endif
 
 #ifndef BTA_DISABLE_DELAY
@@ -999,7 +1000,7 @@
 
 /* Number of simultaneous stream endpoints. */
 #ifndef AVDT_NUM_SEPS
-#define AVDT_NUM_SEPS 6
+#define AVDT_NUM_SEPS 14		//Savitech Patch - see BTAV_A2DP_CODEC_INDEX_MAX
 #endif
 
 /* Number of transport channels setup by AVDT for all media streams */

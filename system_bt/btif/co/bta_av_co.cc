@@ -1,5 +1,4 @@
-/******************************************************************************
- *
+/****************************************************************************** *
  *  Copyright 2004-2012 Broadcom Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -422,7 +421,7 @@ class BtaAvCo {
   bool SetCodecUserConfig(const RawAddress& peer_address,
                           const btav_a2dp_codec_config_t& codec_user_config);
 
-  /**
+   /**
    * Set the codec audio configuration.
    *
    * @param codec_audio_config the codec audio configuration to set
@@ -960,7 +959,8 @@ tA2DP_STATUS BtaAvCo::ProcessSourceGetConfig(
   // Select the Source codec
   const BtaAvCoSep* p_sink = nullptr;
   if (p_peer->acceptor) {
-    UpdateAllSelectableSourceCodecs(p_peer);
+    // Savitech Patch
+    size_t updated_codecs = UpdateAllSelectableSourceCodecs(p_peer);
     if (p_peer->p_sink == nullptr) {
       // Update the selected codec
       p_peer->p_sink =
@@ -971,6 +971,14 @@ tA2DP_STATUS BtaAvCo::ProcessSourceGetConfig(
       APPL_TRACE_ERROR("%s: cannot find the selected codec for peer %s",
                        __func__, p_peer->addr.ToString().c_str());
       return A2DP_FAIL;
+    }
+    /* Savitech Patch
+     * NOTE: Dispatch the event to make sure a callback with the most recent UPDATED codec info is generated.
+     */
+    if (updated_codecs > 0)
+    {
+      APPL_TRACE_DEBUG("%s: onCodecConfigChanged(updated_codecs:%d)", __func__, updated_codecs);
+  	  ReportSourceCodecState(p_peer);
     }
   } else {
     p_sink = SelectSourceCodec(p_peer);
@@ -1494,9 +1502,9 @@ bool BtaAvCo::SetCodecUserConfig(
   tA2DP_ENCODER_INIT_PEER_PARAMS peer_params;
   GetPeerEncoderParameters(p_peer->addr, &peer_params);
   if (!p_peer->GetCodecs()->setCodecUserConfig(
-          codec_user_config, &peer_params, p_sink->codec_caps,
-          result_codec_config, &restart_input, &restart_output,
-          &config_updated)) {
+      codec_user_config, &peer_params, p_sink->codec_caps,
+      result_codec_config, &restart_input, &restart_output,
+      &config_updated)) {
     success = false;
     goto done;
   }
@@ -1525,8 +1533,6 @@ bool BtaAvCo::SetCodecUserConfig(
     }
 
     p_peer->acceptor = false;
-    APPL_TRACE_DEBUG("%s: call BTA_AvReconfig(0x%x)", __func__,
-                     p_peer->BtaAvHandle());
     BTA_AvReconfig(p_peer->BtaAvHandle(), true, p_sink->sep_info_idx,
                    p_peer->codec_config, num_protect, bta_av_co_cp_scmst);
   }
@@ -1594,7 +1600,7 @@ bool BtaAvCo::SetCodecAudioConfig(
     } else {
       p_peer->acceptor = false;
       APPL_TRACE_DEBUG("%s: call BTA_AvReconfig(0x%x)", __func__,
-                       p_peer->BtaAvHandle());
+          p_peer->BtaAvHandle());
       BTA_AvReconfig(p_peer->BtaAvHandle(), true, p_sink->sep_info_idx,
                      p_peer->codec_config, num_protect, bta_av_co_cp_scmst);
     }
@@ -2172,6 +2178,142 @@ bool bta_av_co_set_codec_user_config(
     const btav_a2dp_codec_config_t& codec_user_config) {
   return bta_av_co_cb.SetCodecUserConfig(peer_address, codec_user_config);
 }
+
+/************************************************
+ * Savitech Patch - LHDC Extended API Start
+ ***********************************************/
+// LHDC Extended API: get target API version
+int bta_av_co_get_codec_LHDC_user_ApiVer(
+    const RawAddress& peer_address,
+    const char *version, const int clen) {
+
+  int success = BT_STATUS_SUCCESS;
+  A2dpCodecConfig* peerCodec = NULL;
+
+  BtaAvCoPeer* p_peer = bta_av_co_cb.FindPeer(peer_address);
+  if (p_peer == nullptr) {
+    APPL_TRACE_ERROR("%s: cannot find peer %s to configure", __func__,
+        peer_address.ToString().c_str());
+    success = BT_STATUS_NOT_READY;
+    goto done;
+  }
+
+  peerCodec = p_peer->GetCodecs()->getCurrentCodecConfig();
+  if (peerCodec) {
+    APPL_TRACE_DEBUG("%s: peerCodec name=%s, codecIndex=%d", __func__,
+        peerCodec->name().c_str(), peerCodec->codecIndex());
+    success = p_peer->GetCodecs()->getLHDCCodecUserApiVer(peerCodec, version, clen);
+    goto done;
+  } else {
+    APPL_TRACE_WARNING("%s: Fail to get current codec of peer!", __func__);
+    success = BT_STATUS_NOT_READY;
+    goto done;
+  }
+
+done:
+  return success;
+}
+
+// LHDC extended API: get user config
+int bta_av_co_get_codec_LHDC_user_config(
+    const RawAddress& peer_address,
+    const char *config, const int clen) {
+
+  int success = BT_STATUS_SUCCESS;
+  A2dpCodecConfig* peerCodec = NULL;
+
+  BtaAvCoPeer* p_peer = bta_av_co_cb.FindPeer(peer_address);
+  if (p_peer == nullptr) {
+    APPL_TRACE_ERROR("%s: cannot find peer %s to configure", __func__,
+        peer_address.ToString().c_str());
+    success = BT_STATUS_NOT_READY;
+    goto done;
+  }
+
+  peerCodec = p_peer->GetCodecs()->getCurrentCodecConfig();
+  if (peerCodec) {
+    APPL_TRACE_DEBUG("%s: peerCodec name=%s, codecIndex=%d", __func__,
+        peerCodec->name().c_str(), peerCodec->codecIndex());
+    success = p_peer->GetCodecs()->getLHDCCodecUserConfig(peerCodec, config, clen);
+    goto done;
+  } else {
+    APPL_TRACE_WARNING("%s: Fail to get current codec of peer!", __func__);
+    success = BT_STATUS_NOT_READY;
+    goto done;
+  }
+
+done:
+  return success;
+}
+
+// LHDC extended API: set user config
+int bta_av_co_set_codec_LHDC_user_config(
+    const RawAddress& peer_address,
+    const char *config, const int clen) {
+
+  int success = BT_STATUS_SUCCESS;
+  A2dpCodecConfig* peerCodec = NULL;
+
+  BtaAvCoPeer* p_peer = bta_av_co_cb.FindPeer(peer_address);
+  if (p_peer == nullptr) {
+    APPL_TRACE_ERROR("%s: cannot find peer %s to configure", __func__,
+        peer_address.ToString().c_str());
+    success = BT_STATUS_NOT_READY;
+    goto done;
+  }
+
+  peerCodec = p_peer->GetCodecs()->getCurrentCodecConfig();
+  if (peerCodec) {
+    APPL_TRACE_DEBUG("%s: peerCodec name=%s, codecIndex=%d", __func__,
+        peerCodec->name().c_str(), peerCodec->codecIndex());
+    success = p_peer->GetCodecs()->setLHDCCodecUserConfig(peerCodec, config, clen);
+    goto done;
+  } else {
+    APPL_TRACE_WARNING("%s: Fail to get current codec of peer!", __func__);
+    success = BT_STATUS_NOT_READY;
+    goto done;
+  }
+
+done:
+  return success;
+}
+
+// LHDC extended API: set user data
+bool bta_av_co_set_codec_LHDC_user_data(
+    const RawAddress& peer_address,
+    const char *data, const int clen) {
+
+  bool success = true;
+  A2dpCodecConfig* peerCodec = NULL;
+
+  BtaAvCoPeer* p_peer = bta_av_co_cb.FindPeer(peer_address);
+  if (p_peer == nullptr) {
+    APPL_TRACE_ERROR("%s: cannot find peer %s to configure", __func__,
+        peer_address.ToString().c_str());
+    success = false;
+    goto done;
+  }
+
+  peerCodec = p_peer->GetCodecs()->getCurrentCodecConfig();
+  if (peerCodec) {
+    APPL_TRACE_DEBUG("%s: peerCodec: name=%s, codecIndex=%d", __func__,
+        peerCodec->name().c_str(), peerCodec->codecIndex());
+    if (!p_peer->GetCodecs()->setLHDCCodecUserData(peerCodec, data, clen)) {
+      success = false;
+      goto done;
+    }
+  } else {
+    APPL_TRACE_WARNING("%s: Fail to get current codec of peer!", __func__);
+    success = false;
+    goto done;
+  }
+
+done:
+  return success;
+}
+/************************************************
+ * Savitech Patch - LHDC Extended API End
+ ***********************************************/
 
 bool bta_av_co_set_codec_audio_config(
     const btav_a2dp_codec_config_t& codec_audio_config) {

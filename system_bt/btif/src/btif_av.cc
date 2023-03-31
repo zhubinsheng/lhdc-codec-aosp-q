@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 #define LOG_TAG "btif_av"
+#define SAVITECH_A2DP_SINK  // Savitech Patch - A2DP_Sink_Enable
 
 #include "btif_av.h"
 
@@ -493,24 +494,28 @@ class BtifAvSource {
       const RawAddress& peer_address,
       const std::vector<btav_a2dp_codec_config_t>& codec_preferences,
       std::promise<void> peer_ready_promise) {
-    // Restart the session if the codec for the active peer is updated
-    bool restart_session =
-        ((active_peer_ == peer_address) && !active_peer_.IsEmpty());
-    if (restart_session) {
-      btif_a2dp_source_end_session(active_peer_);
-    }
 
-    for (auto cp : codec_preferences) {
-      BTIF_TRACE_DEBUG("%s: codec_preference=%s", __func__,
-                       cp.ToString().c_str());
-      btif_a2dp_source_encoder_user_config_update_req(peer_address, cp);
-    }
-    if (restart_session) {
-      btif_a2dp_source_start_session(active_peer_,
-                                     std::move(peer_ready_promise));
-    } else {
-      peer_ready_promise.set_value();
-    }
+    for (auto cp : codec_preferences)
+    {
+        // Restart the session if the codec for the active peer is updated
+        bool restart_session =
+            ((active_peer_ == peer_address) && !active_peer_.IsEmpty());
+
+        if (restart_session) {
+          btif_a2dp_source_end_session(active_peer_);
+        }
+
+        BTIF_TRACE_WARNING("%s: codec_preference=%s", __func__,
+            cp.ToString().c_str());
+        btif_a2dp_source_encoder_user_config_update_req(peer_address, cp);
+
+        if (restart_session) {
+          btif_a2dp_source_start_session(active_peer_, std::move(peer_ready_promise));
+        }
+        else {
+          peer_ready_promise.set_value();
+        }
+    }   /* end for */
   }
 
   const std::map<RawAddress, BtifAvPeer*>& Peers() const { return peers_; }
@@ -690,6 +695,62 @@ static void btif_av_sink_initiate_av_open_timer_timeout(void* data);
 static void bta_av_sink_media_callback(tBTA_AV_EVT event,
                                        tBTA_AV_MEDIA* p_data);
 
+static BtifAvPeer* btif_av_source_find_peer(const RawAddress& peer_address);
+static BtifAvPeer* btif_av_sink_find_peer(const RawAddress& peer_address);
+
+static BtifAvPeer* btif_av_find_active_peer() {
+#ifdef SAVITECH_A2DP_SINK
+  BtifAvPeer* activePeerIsSink = NULL;
+  BtifAvPeer* activePeerIsSrc = NULL;
+
+  if (btif_av_source.Enabled()) {
+    BTIF_TRACE_VERBOSE("%s: SRC Find -> ActivePeer:%s (%p)",
+    		__func__,
+			btif_av_source.ActivePeer().ToString().c_str(),
+			btif_av_source_find_peer(btif_av_source.ActivePeer()));
+    activePeerIsSink = btif_av_source_find_peer(btif_av_source.ActivePeer());
+  }
+  if (btif_av_sink.Enabled()) {
+	BTIF_TRACE_VERBOSE("%s: Sink Find -> ActivePeer:%s (%p)",
+    		__func__,
+			btif_av_sink.ActivePeer().ToString().c_str(),
+			btif_av_sink_find_peer(btif_av_sink.ActivePeer()));
+    activePeerIsSrc = btif_av_sink_find_peer(btif_av_sink.ActivePeer());
+  }
+
+  if( activePeerIsSrc != NULL && activePeerIsSink != NULL) {
+	//should not happened here
+	BTIF_TRACE_WARNING("%s: WARNING! Have both Src/Sink ActivePeers! (use default: SRC)", __func__);
+	return activePeerIsSrc;
+  }
+  if( activePeerIsSink != NULL) {
+	//AVDT_TSEP_SNK(1)
+	BTIF_TRACE_VERBOSE("%s: activePeerIsSink:%s Sep:%d", __func__,
+			  activePeerIsSink->PeerAddress().ToString().c_str(), activePeerIsSink->PeerSep());
+	return activePeerIsSink;
+  }
+  if( activePeerIsSrc != NULL) {
+	//AVDT_TSEP_SRC(0)
+	BTIF_TRACE_VERBOSE("%s: activePeerIsSrc:%s Sep:%d", __func__,
+			  activePeerIsSrc->PeerAddress().ToString().c_str(), activePeerIsSrc->PeerSep());
+	return activePeerIsSrc;
+  }
+  BTIF_TRACE_VERBOSE("%s: no any active peer found, RET nullptr", __func__);
+  return nullptr;
+#else
+  if (btif_av_source.Enabled())
+  {
+    return btif_av_source_find_peer(btif_av_source.ActivePeer());
+  }
+
+  if (btif_av_sink.Enabled())
+  {
+    return btif_av_sink_find_peer(btif_av_sink.ActivePeer());
+  }
+
+  return nullptr;
+#endif
+}
 static BtifAvPeer* btif_av_source_find_peer(const RawAddress& peer_address) {
   return btif_av_source.FindPeer(peer_address);
 }
@@ -697,16 +758,23 @@ static BtifAvPeer* btif_av_sink_find_peer(const RawAddress& peer_address) {
   return btif_av_sink.FindPeer(peer_address);
 }
 static BtifAvPeer* btif_av_find_peer(const RawAddress& peer_address) {
+#ifdef SAVITECH_A2DP_SINK
+  BtifAvPeer* avPeer = NULL;
+  avPeer = btif_av_find_active_peer();
+  if(avPeer) {
+	if(avPeer->PeerSep()==AVDT_TSEP_SRC) {
+	  return btif_av_sink_find_peer(peer_address);
+	}
+	if(avPeer->PeerSep()==AVDT_TSEP_SNK) {
+	  return btif_av_source_find_peer(peer_address);
+	}
+  }
+  return nullptr;
+#else
   if (btif_av_source.Enabled()) return btif_av_source_find_peer(peer_address);
   if (btif_av_sink.Enabled()) return btif_av_sink_find_peer(peer_address);
   return nullptr;
-}
-static BtifAvPeer* btif_av_find_active_peer() {
-  if (btif_av_source.Enabled())
-    return btif_av_source_find_peer(btif_av_source.ActivePeer());
-  if (btif_av_sink.Enabled())
-    return btif_av_sink_find_peer(btif_av_sink.ActivePeer());
-  return nullptr;
+#endif
 }
 
 /*****************************************************************************
@@ -1443,6 +1511,34 @@ bool BtifAvStateMachine::StateIdle::ProcessEvent(uint32_t event, void* p_data) {
 
       bool can_connect = true;
       // Check whether connection is allowed
+#ifdef SAVITECH_A2DP_SINK
+      if (peer_.IsSink()) {
+        can_connect = btif_av_source.AllowedToConnect(peer_.PeerAddress());
+        if (!can_connect) {
+          src_disconnect_sink(peer_.PeerAddress());
+        } else {
+          alarm_set_on_mloop(
+                peer_.AvOpenOnRcTimer(), BtifAvPeer::kTimeoutAvOpenOnRcMs,
+                btif_av_source_initiate_av_open_timer_timeout, &peer_);
+        }
+      } else if (peer_.IsSource()) {
+        can_connect = btif_av_sink.AllowedToConnect(peer_.PeerAddress());
+        if (!can_connect) {
+          sink_disconnect_src(peer_.PeerAddress());
+        } else {
+          alarm_set_on_mloop(peer_.AvOpenOnRcTimer(),
+                               BtifAvPeer::kTimeoutAvOpenOnRcMs,
+                               btif_av_sink_initiate_av_open_timer_timeout, &peer_);
+        }
+      }
+      if (!can_connect) {
+        BTIF_TRACE_ERROR(
+            "%s: Cannot connect to peer %s: too many connected "
+            "peers",
+            __PRETTY_FUNCTION__, peer_.PeerAddress().ToString().c_str());
+        break;
+      }
+#else
       if (peer_.IsSink()) {
         can_connect = btif_av_source.AllowedToConnect(peer_.PeerAddress());
         if (!can_connect) src_disconnect_sink(peer_.PeerAddress());
@@ -1466,6 +1562,7 @@ bool BtifAvStateMachine::StateIdle::ProcessEvent(uint32_t event, void* p_data) {
                            BtifAvPeer::kTimeoutAvOpenOnRcMs,
                            btif_av_sink_initiate_av_open_timer_timeout, &peer_);
       }
+#endif
       if (event == BTA_AV_RC_OPEN_EVT) {
         btif_rc_handler(event, (tBTA_AV*)p_data);
       }
@@ -2292,6 +2389,37 @@ static void btif_report_connection_state(const RawAddress& peer_address,
   LOG_INFO(LOG_TAG, "%s: peer_address=%s state=%d", __func__,
            peer_address.ToString().c_str(), state);
 
+#ifdef SAVITECH_A2DP_SINK
+	BtifAvPeer* activePeer = NULL;
+	activePeer = btif_av_find_active_peer();
+	if(activePeer)
+	{
+		if(activePeer->PeerSep()==AVDT_TSEP_SRC)
+		{
+			LOG_INFO(LOG_TAG, "%s: ImSink -> connection_state_cb..", __func__);
+			do_in_jni_thread(FROM_HERE,
+					base::Bind(btif_av_sink.Callbacks()->connection_state_cb, peer_address, state));
+		}
+		if(activePeer->PeerSep()==AVDT_TSEP_SNK)
+		{
+			LOG_INFO(LOG_TAG, "%s: ImSRC -> connection_state_cb..", __func__);
+			do_in_jni_thread(FROM_HERE,
+					base::Bind(btif_av_source.Callbacks()->connection_state_cb, peer_address, state));
+		}
+	}
+	else
+	{
+	    if (btif_av_source.Enabled()) {
+	    	LOG_INFO(LOG_TAG, "%s: no active peer, source->connection_state_cb..", __func__);
+	    	do_in_jni_thread(FROM_HERE,
+	    			base::Bind(btif_av_source.Callbacks()->connection_state_cb, peer_address, state));
+	    } else if (btif_av_sink.Enabled()) {
+	    	LOG_INFO(LOG_TAG, "%s: no active peer, sink->connection_state_cb..", __func__);
+	    	do_in_jni_thread(FROM_HERE,
+	    			base::Bind(btif_av_sink.Callbacks()->connection_state_cb, peer_address, state));
+	    }
+	}
+#else
   if (btif_av_source.Enabled()) {
     do_in_jni_thread(FROM_HERE,
                      base::Bind(btif_av_source.Callbacks()->connection_state_cb,
@@ -2301,6 +2429,7 @@ static void btif_report_connection_state(const RawAddress& peer_address,
                      base::Bind(btif_av_sink.Callbacks()->connection_state_cb,
                                 peer_address, state));
   }
+#endif
 }
 
 /**
@@ -2317,6 +2446,41 @@ static void btif_report_audio_state(const RawAddress& peer_address,
   LOG_INFO(LOG_TAG, "%s: peer_address=%s state=%d", __func__,
            peer_address.ToString().c_str(), state);
 
+#ifdef SAVITECH_A2DP_SINK
+	BtifAvPeer* avPeer = NULL;
+	avPeer = btif_av_find_active_peer();
+	if(avPeer)
+	{
+		if(avPeer->PeerSep()==AVDT_TSEP_SRC)
+		{
+			LOG_INFO(LOG_TAG, "%s: ImSink -> audio_state_cb..", __func__);
+		    do_in_jni_thread(FROM_HERE,
+		    		base::Bind(btif_av_sink.Callbacks()->audio_state_cb,
+		    				peer_address, state));
+		}
+		if(avPeer->PeerSep()==AVDT_TSEP_SNK)
+		{
+			LOG_INFO(LOG_TAG, "%s: ImSRC -> audio_state_cb..", __func__);
+		    do_in_jni_thread(FROM_HERE,
+		    		base::Bind(btif_av_source.Callbacks()->audio_state_cb,
+		    				peer_address, state));
+		}
+	}
+	else
+	{
+	    if (btif_av_source.Enabled()) {
+	    	LOG_INFO(LOG_TAG, "%s: no active peer, source->audio_state_cb..", __func__);
+	        do_in_jni_thread(FROM_HERE,
+	                         base::Bind(btif_av_source.Callbacks()->audio_state_cb,
+	                                    peer_address, state));
+	    } else if (btif_av_sink.Enabled()) {
+	    	LOG_INFO(LOG_TAG, "%s: no active peer, sink->audio_state_cb..", __func__);
+	        do_in_jni_thread(FROM_HERE,
+	                         base::Bind(btif_av_sink.Callbacks()->audio_state_cb,
+	                                    peer_address, state));
+	    }
+	}
+#else
   if (btif_av_source.Enabled()) {
     do_in_jni_thread(FROM_HERE,
                      base::Bind(btif_av_source.Callbacks()->audio_state_cb,
@@ -2326,6 +2490,7 @@ static void btif_report_audio_state(const RawAddress& peer_address,
                      base::Bind(btif_av_sink.Callbacks()->audio_state_cb,
                                 peer_address, state));
   }
+#endif
 }
 
 void btif_av_report_source_codec_state(
@@ -2819,6 +2984,88 @@ static bt_status_t codec_config_src(
   return status;
 }
 
+// Savitech Patch - LHDC Extended API Start
+static int lhdc_getApiVer_src(
+    const RawAddress& peer_address,
+    char* version, int clen) {
+
+  int status = BT_STATUS_NOT_READY;
+
+  if (!btif_av_source.Enabled()) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source is not enabled";
+    return BT_STATUS_NOT_READY;
+  }
+
+  status = btif_a2dp_source_encoder_LHDC_user_ApiVer_retrieve_req(peer_address, version, clen);
+
+  if (status != BT_STATUS_SUCCESS) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source fails to config LHDC codec";
+  }
+
+  return status;
+}
+
+static int lhdc_getApiCfg_src(
+    const RawAddress& peer_address,
+    char* config, int clen) {
+
+  int status = BT_STATUS_NOT_READY;
+
+  if (!btif_av_source.Enabled()) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source is not enabled";
+    return BT_STATUS_NOT_READY;
+  }
+
+  status = btif_a2dp_source_encoder_LHDC_user_config_retrieve_req(peer_address, config, clen);
+
+  if (status != BT_STATUS_SUCCESS) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source fails to config LHDC codec";
+  }
+
+  return status;
+}
+
+static int lhdc_setApiCfg_src(
+    const RawAddress& peer_address,
+    char* config, int clen) {
+
+  int status = BT_STATUS_NOT_READY;
+
+  if (!btif_av_source.Enabled()) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source is not enabled";
+    return BT_STATUS_NOT_READY;
+  }
+
+  status = btif_a2dp_source_encoder_LHDC_user_config_update_req(peer_address, config, clen);
+
+  if (status != BT_STATUS_SUCCESS) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source fails to config LHDC codec";
+  }
+
+  return status;
+}
+
+static void lhdc_setApiData_src(
+    const RawAddress& peer_address,
+    char* data, int clen) {
+
+  if (!btif_av_source.Enabled()) {
+    LOG(WARNING) << __func__ << ": BTIF AV Source is not enabled";
+    return;
+  }
+
+  btif_av_codec_lhdc_api_data_t codec_data;
+  memcpy(&codec_data.bd_addr, (uint8_t *)&peer_address, sizeof(RawAddress));
+  codec_data.clen = clen;
+  codec_data.pData = data;
+
+  btif_transfer_context(btif_a2dp_source_encoder_LHDC_user_data_update_req, 0,
+                          (char *)&codec_data, sizeof(codec_data), NULL);
+
+  return;
+}
+// Savitech Patch - LHDC Extended API End
+
 static void cleanup_src(void) {
   BTIF_TRACE_EVENT("%s", __func__);
   do_in_main_thread(FROM_HERE, base::Bind(&BtifAvSource::Cleanup,
@@ -2840,6 +3087,11 @@ static const btav_source_interface_t bt_av_src_interface = {
     src_set_active_sink,
     codec_config_src,
     cleanup_src,
+    // Savitech Patch
+    lhdc_getApiVer_src,
+    lhdc_getApiCfg_src,
+    lhdc_setApiCfg_src,
+    lhdc_setApiData_src,
 };
 
 static const btav_sink_interface_t bt_av_sink_interface = {
@@ -3126,11 +3378,26 @@ void btif_av_acl_disconnected(const RawAddress& peer_address) {
   LOG_INFO(LOG_TAG, "%s: Peer %s : ACL Disconnected", __func__,
            peer_address.ToString().c_str());
 
+#ifdef SAVITECH_A2DP_SINK
+  BtifAvPeer* avPeer = NULL;
+  avPeer = btif_av_find_active_peer();
+  if(avPeer) {
+	if(avPeer->PeerSep()==AVDT_TSEP_SRC) {
+	  LOG_INFO(LOG_TAG, "%s: peer SRC", __func__);
+      btif_av_sink_dispatch_sm_event(peer_address, BTIF_AV_ACL_DISCONNECTED);
+	}
+	if(avPeer->PeerSep()==AVDT_TSEP_SNK) {
+	  LOG_INFO(LOG_TAG, "%s: Peer Sink", __func__);
+	  btif_av_source_dispatch_sm_event(peer_address, BTIF_AV_ACL_DISCONNECTED);
+	}
+  }
+#else
   if (btif_av_source.Enabled()) {
     btif_av_source_dispatch_sm_event(peer_address, BTIF_AV_ACL_DISCONNECTED);
   } else if (btif_av_sink.Enabled()) {
     btif_av_sink_dispatch_sm_event(peer_address, BTIF_AV_ACL_DISCONNECTED);
   }
+#endif
 }
 
 static void btif_debug_av_peer_dump(int fd, const BtifAvPeer& peer) {

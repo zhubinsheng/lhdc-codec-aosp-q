@@ -94,6 +94,8 @@ cc_library_shared {
         "bt_stack.conf",
         "libldacBT_enc",
         "libldacBT_abr",
+        "liblhdcBT_enc",
+        "liblhdcv5BT_enc",
     ],
     cflags: [
         "-DBUILDCFG",

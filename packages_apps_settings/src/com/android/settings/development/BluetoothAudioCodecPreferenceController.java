@@ -82,6 +82,18 @@ public class BluetoothAudioCodecPreferenceController extends
                     case 5:
                         codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LDAC;
                         break;
+                    case 6:	//Savitech Patch
+                        codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV3;
+                        break;
+                    case 7:
+                        codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV2;
+                        break;
+                    case 8:
+                        codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV1;
+                        break;
+                    case 9:
+                        codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV5;
+                        break;
                     default:
                         break;
                 }
@@ -106,14 +118,30 @@ public class BluetoothAudioCodecPreferenceController extends
                 codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LDAC;
                 codecPriorityValue = BluetoothCodecConfig.CODEC_PRIORITY_HIGHEST;
                 break;
-            case 6:
+            case 6:	//Savitech Patch
+                codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV3;
+                codecPriorityValue = BluetoothCodecConfig.CODEC_PRIORITY_HIGHEST;
+                break;
+            case 7:
+                codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV2;
+                codecPriorityValue = BluetoothCodecConfig.CODEC_PRIORITY_HIGHEST;
+                break;
+            case 8:
+                codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV1;
+                codecPriorityValue = BluetoothCodecConfig.CODEC_PRIORITY_HIGHEST;
+                break;
+            case 9:
+                codecTypeValue = BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV5;
+                codecPriorityValue = BluetoothCodecConfig.CODEC_PRIORITY_HIGHEST;
+                break;
+            case 10:
                 synchronized (mBluetoothA2dpConfigStore) {
                     if (mBluetoothA2dp != null) {
                         mBluetoothA2dp.enableOptionalCodecs(null); // Use current active device
                     }
                 }
                 return;
-            case 7:
+            case 11:
                 synchronized (mBluetoothA2dpConfigStore) {
                     if (mBluetoothA2dp != null) {
                         mBluetoothA2dp.disableOptionalCodecs(null); // Use current active device
@@ -146,6 +174,18 @@ public class BluetoothAudioCodecPreferenceController extends
                 break;
             case BluetoothCodecConfig.SOURCE_CODEC_TYPE_LDAC:
                 index = 5;
+                break;
+            case BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV3:
+                index = 6;	//Savitech Patch
+                break;
+            case BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV2:
+                index = 7;
+                break;
+            case BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV1:
+                index = 8;
+                break;
+            case BluetoothCodecConfig.SOURCE_CODEC_TYPE_LHDCV5:
+                index = 9;
                 break;
             case BluetoothCodecConfig.SOURCE_CODEC_TYPE_INVALID:
             default:

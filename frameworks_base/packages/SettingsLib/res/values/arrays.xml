@@ -140,6 +140,12 @@
         <item><xliff:g id="qualcomm">Qualcomm®</xliff:g> <xliff:g id="aptx">aptX™</xliff:g> audio</item>
         <item><xliff:g id="qualcomm">Qualcomm®</xliff:g> <xliff:g id="aptx_hd">aptX™ HD</xliff:g> audio</item>
         <item>LDAC</item>
+        <!-- Savitech Patch - START -->
+        <item>Savitech® LHDC V3/V4™</item>
+        <item>Savitech® LHDC V2™</item>
+        <item>Savitech® LHDC V1™</item>
+        <item>Savitech® LHDC-V™</item>
+        <!-- Savitech Patch - END -->
         <item>Enable Optional Codecs</item>
         <item>Disable Optional Codecs</item>
     </string-array>
@@ -154,6 +160,12 @@
         <item>4</item>
         <item>5</item>
         <item>6</item>
+        <!-- Savitech Patch - START -->
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <!-- Savitech Patch - END -->
     </string-array>
 
     <!-- Summaries for Bluetooth Audio Codec selection preference. [CHAR LIMIT=50]-->
@@ -164,6 +176,12 @@
         <item><xliff:g id="qualcomm">Qualcomm®</xliff:g> <xliff:g id="aptx">aptX™</xliff:g> audio</item>
         <item><xliff:g id="qualcomm">Qualcomm®</xliff:g> <xliff:g id="aptx_hd">aptX™ HD</xliff:g> audio</item>
         <item>LDAC</item>
+        <!-- Savitech Patch - START -->
+        <item>Savitech® LHDC V3/V4™</item>
+        <item>Savitech® LHDC V2™</item>
+        <item>Savitech® LHDC V1™</item>
+        <item>Savitech® LHDC-V™</item>
+        <!-- Savitech Patch - END -->
         <item>Enable Optional Codecs</item>
         <item>Disable Optional Codecs</item>
     </string-array>
@@ -175,6 +193,10 @@
         <item>48.0 kHz</item>
         <item>88.2 kHz</item>
         <item>96.0 kHz</item>
+        <!-- Savitech Patch - START -->
+        <item>176.4 kHz</item>
+        <item>192.0 kHz</item>
+        <!-- Savitech Patch - END -->
     </string-array>
 
     <!-- Values for Bluetooth Audio Codec Sample Rate selection preference. -->
@@ -184,6 +206,10 @@
         <item>2</item>
         <item>4</item>
         <item>8</item>
+        <!-- Savitech Patch - START -->
+        <item>16</item>
+        <item>32</item>
+        <!-- Savitech Patch - END -->
     </string-array>
 
     <!-- Summaries for Bluetooth Audio Codec Sample Rate selection preference. [CHAR LIMIT=50]-->
@@ -193,6 +219,10 @@
         <item>48.0 kHz</item>
         <item>88.2 kHz</item>
         <item>96.0 kHz</item>
+        <!-- Savitech Patch - START -->
+        <item>176.4 kHz</item>
+        <item>192.0 kHz</item>
+        <!-- Savitech Patch - END -->
     </string-array>
 
     <!-- Titles for Bluetooth Audio Codec Bits Per Sample selection preference. [CHAR LIMIT=50] -->
@@ -263,7 +293,106 @@
         <item>Optimized for Connection Quality</item>
         <item>Best Effort (Adaptive Bit Rate)</item>
     </string-array>
+    
+    <!-- Savitech Patch - START -->
+    <!-- Titles for Bluetooth Audio Codec LHDC AR Effect selection preference. [CHAR LIMIT=70] -->
+    <string-array name="bluetooth_enable_a2dp_codec_lhdc_ar_effect_titles" translatable="false" >
+        <item>OFF</item>
+        <item>ON</item>
+    </string-array>
+    
+    <!-- Values for Bluetooth Audio Codec LHDC AR Effect selection preference -->
+    <string-array name="bluetooth_enable_a2dp_codec_lhdc_ar_effect_values" translatable="false" >
+        <item>0</item>
+        <item>2</item>
+    </string-array>
+    
+    <!-- Summaries for Bluetooth Audio Codec LHDC AR Effect selection preference [CHAR LIMIT=70]-->
+    <string-array name="bluetooth_enable_a2dp_codec_lhdc_ar_effect_summaries" translatable="false" >
+        <item>LHDC AR effect off</item>
+        <item>LHDC AR effect on</item>
+    </string-array>
 
+    
+    <!-- Titles for Bluetooth Audio Codec LHDC Playback Quality selection preference. [CHAR LIMIT=70] -->
+    <string-array name="bluetooth_a2dp_codec_lhdc_playback_quality_titles" translatable="false" >
+        <item>Optimized for Connection Quality (64kbps)</item>
+        <item>Optimized for Connection Quality (128kbps)</item>
+        <item>Optimized for Connection Quality (192kbps)</item>
+        <item>Optimized for Connection Quality (256kbps)</item>
+        <item>Optimized for Connection Quality (320kbps)</item>
+        <item>Optimized for Connection Quality (400kbps)</item>
+        <item>Balanced Audio And Connection Quality (500kbps)</item>
+        <item>High Audio Quality (900kbps)</item>
+        <item>Extremely High Audio Quality (1000kbps)</item>
+        <item>Best Effort (Auto Bit Rate)</item>
+    </string-array>
+    
+    <!-- Values for Bluetooth Audio Codec LHDC Playback Quaility selection preference. -->
+    <string-array name="bluetooth_a2dp_codec_lhdc_playback_quality_values" translatable="false" >
+        <item>32768</item>
+        <item>32769</item>
+        <item>32770</item>
+        <item>32771</item>
+        <item>32772</item>
+        <item>32773</item>
+        <item>32774</item>
+        <item>32775</item>
+        <item>32776</item>
+        <item>32777</item>
+    </string-array>
+    
+    <!-- Summaries for Bluetooth Audio Codec LHDC Playback Quality selection preference. [CHAR LIMIT=70]-->
+    <string-array name="bluetooth_a2dp_codec_lhdc_playback_quality_summaries" translatable="false" >
+        <item>Optimized for Connection Quality (64kbps)</item>
+        <item>Optimized for Connection Quality (128kbps)</item>
+        <item>Optimized for Connection Quality (192kbps)</item>
+        <item>Optimized for Connection Quality (256kbps)</item>
+        <item>Optimized for Connection Quality (320kbps)</item>
+        <item>Optimized for Connection Quality</item>
+        <item>Balanced Audio And Connection Quality</item>
+        <item>High Audio Quality</item>
+        <item>Extremely High Audio Quality</item>
+        <item>Best Effort (Auto Bit Rate)</item>
+    </string-array>
+    
+    <!-- Titles for Bluetooth Audio Codec LHDC Latency selection preference. [CHAR LIMIT=70] -->
+    <string-array name="bluetooth_a2dp_codec_lhdc_latency_titles" translatable="false" >
+        <item>Low latency disable</item>
+        <item>Low latency enable (only support aosp 9+)</item>
+    </string-array>
+    
+    <!-- Values for Bluetooth Audio Codec LHDC Latency selection preference. -->
+    <string-array name="bluetooth_a2dp_codec_lhdc_latency_values" translatable="false" >
+        <item>49152</item>
+        <item>49153</item>
+    </string-array>
+    
+    <!-- Summaries for Bluetooth Audio Codec LHDC Latency selection preference. [CHAR LIMIT=70]-->
+    <string-array name="bluetooth_a2dp_codec_lhdc_latency_summaries" translatable="false" >
+        <item>Low latency disable</item>
+        <item>Low latency enable</item>
+    </string-array>
+    
+    <!-- Titles for Bluetooth Audio Codec LHDC Lossless selection preference. [CHAR LIMIT=70] -->
+    <string-array name="bluetooth_enable_a2dp_codec_lhdc_lossless_titles" translatable="false" >
+        <item>OFF</item>
+        <item>ON</item>
+    </string-array>
+
+    <!-- Values for Bluetooth Audio Codec LHDC Lossless selection preference -->
+    <string-array name="bluetooth_enable_a2dp_codec_lhdc_lossless_values" translatable="false" >
+        <item>0</item>
+        <item>2</item>
+    </string-array>
+
+    <!-- Summaries for Bluetooth Audio Codec LHDC Lossless selection preference [CHAR LIMIT=70]-->
+    <string-array name="bluetooth_enable_a2dp_codec_lhdc_lossless_summaries" translatable="false" >
+        <item>LHDC Lossless OFF</item>
+        <item>LHDC Lossless ON</item>
+    </string-array>
+    <!-- Savitech Patch - END -->
+    
     <!-- Summaries for Android Auto Bluetooth Audio Active Device status. [CHAR LIMIT=50]-->
     <string-array name="bluetooth_audio_active_device_summaries" >
         <!-- Status message when the device is not Active. -->

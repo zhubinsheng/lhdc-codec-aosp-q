@@ -51,6 +51,25 @@ static std::shared_timed_mutex interface_mutex;
 static jobject mCallbacksObj = nullptr;
 static std::shared_timed_mutex callbacks_mutex;
 
+// Savitech Patch - START
+static char *jByteArrayToChar(JNIEnv *env, jbyteArray buf) {
+    char *chars = NULL;
+    jbyte *bytes;
+    bytes = env->GetByteArrayElements(buf, 0);
+    if (!bytes) {
+      jniThrowIOException(env, EINVAL);
+      return JNI_FALSE;
+    }
+    int chars_len = env->GetArrayLength(buf);
+    chars = new char[chars_len + 1];
+    memset(chars, 0, chars_len + 1);
+    memcpy(chars, bytes, chars_len);
+    chars[chars_len] = 0;
+    env->ReleaseByteArrayElements(buf, bytes, 0);
+    return chars;
+}
+// Savitech Patch - END
+
 static void bta2dp_connection_state_callback(const RawAddress& bd_addr,
                                              btav_connection_state_t state) {
   ALOGI("%s", __func__);
@@ -446,6 +465,7 @@ static jboolean setActiveDeviceNative(JNIEnv* env, jobject object,
 static jboolean setCodecConfigPreferenceNative(JNIEnv* env, jobject object,
                                                jbyteArray address,
                                                jobjectArray codecConfigArray) {
+
   ALOGI("%s: sBluetoothA2dpInterface: %p", __func__, sBluetoothA2dpInterface);
   std::shared_lock<std::shared_timed_mutex> lock(interface_mutex);
   if (!sBluetoothA2dpInterface) {
@@ -473,6 +493,172 @@ static jboolean setCodecConfigPreferenceNative(JNIEnv* env, jobject object,
   return (status == BT_STATUS_SUCCESS) ? JNI_TRUE : JNI_FALSE;
 }
 
+/************************************************
+ * Savitech Patch - LHDC Extended API Start
+ ***********************************************/
+static jint getLhdcCodecExtendAPIVerNative(JNIEnv* env, jobject object,
+                                           jbyteArray address,
+                                           jbyteArray codecConfig){
+
+  int status = BT_STATUS_FAIL;
+  std::shared_lock<std::shared_timed_mutex> lock(interface_mutex);
+  if (!sBluetoothA2dpInterface) {
+    ALOGE("%s: Failed to get the Bluetooth A2DP Interface", __func__);
+    return status;
+  }
+
+  jbyte* addr = env->GetByteArrayElements(address, nullptr);
+  if (!addr) {
+    jniThrowIOException(env, EINVAL);
+    return status;
+  }
+
+  RawAddress bd_addr;
+  bd_addr.FromOctets(reinterpret_cast<const uint8_t*>(addr));
+
+  char *chars = NULL;
+  int chars_len = env->GetArrayLength(codecConfig);
+  chars = jByteArrayToChar(env, codecConfig);
+  if(!chars)
+  {
+    env->ReleaseByteArrayElements(address, addr, 0);
+    return status;
+  }
+
+  //to bt_av
+  status =
+      sBluetoothA2dpInterface->getApiVer_lhdc(bd_addr, chars, chars_len);
+
+  if (status != BT_STATUS_SUCCESS) {
+    ALOGE("%s: Failed codec configuration, status: %d", __func__, status);
+  }
+  else {
+    env->SetByteArrayRegion(codecConfig, 0, chars_len, reinterpret_cast<jbyte *>(chars));
+  }
+
+  env->ReleaseByteArrayElements(address, addr, 0);
+  delete[] chars;
+
+  return status;
+}
+
+static jint getLhdcCodecExtendAPIConfigNative(JNIEnv* env, jobject object,
+                                           jbyteArray address,
+                                           jbyteArray codecConfig){
+
+  int status = BT_STATUS_FAIL;
+  std::shared_lock<std::shared_timed_mutex> lock(interface_mutex);
+  if (!sBluetoothA2dpInterface) {
+    ALOGE("%s: Failed to get the Bluetooth A2DP Interface", __func__);
+    return status;
+  }
+
+  jbyte* addr = env->GetByteArrayElements(address, nullptr);
+  if (!addr) {
+    jniThrowIOException(env, EINVAL);
+    return status;
+  }
+
+  RawAddress bd_addr;
+  bd_addr.FromOctets(reinterpret_cast<const uint8_t*>(addr));
+
+  char *chars = NULL;
+  int chars_len = env->GetArrayLength(codecConfig);
+  chars = jByteArrayToChar(env, codecConfig);
+  if(!chars)
+  {
+    env->ReleaseByteArrayElements(address, addr, 0);
+    return status;
+  }
+
+  //to bt_av
+  status =
+      sBluetoothA2dpInterface->getApiCfg_lhdc(bd_addr, chars, chars_len);
+
+  if (status != BT_STATUS_SUCCESS) {
+    ALOGE("%s: Failed codec configuration, status: %d", __func__, status);
+  }
+  else {
+    env->SetByteArrayRegion(codecConfig, 0, chars_len, reinterpret_cast<jbyte *>(chars));
+  }
+
+  env->ReleaseByteArrayElements(address, addr, 0);
+  delete[] chars;
+
+  return status;
+}
+
+static jint setLhdcCodecExtendAPIConfigNative(JNIEnv* env, jobject object,
+                                           jbyteArray address,
+                                           jbyteArray codecConfig){
+
+  std::shared_lock<std::shared_timed_mutex> lock(interface_mutex);
+  if (!sBluetoothA2dpInterface) {
+    ALOGE("%s: Failed to get the Bluetooth A2DP Interface", __func__);
+    return JNI_FALSE;
+  }
+
+  jbyte* addr = env->GetByteArrayElements(address, nullptr);
+  if (!addr) {
+    jniThrowIOException(env, EINVAL);
+    return JNI_FALSE;
+  }
+
+  RawAddress bd_addr;
+  bd_addr.FromOctets(reinterpret_cast<const uint8_t*>(addr));
+
+  char *chars = NULL;
+  int chars_len = env->GetArrayLength(codecConfig);
+  chars = jByteArrayToChar(env, codecConfig);
+
+  //to bt_av
+  int status =
+      sBluetoothA2dpInterface->setApiCfg_lhdc(bd_addr, chars, chars_len);
+
+  if (status != BT_STATUS_SUCCESS) {
+    ALOGE("%s: Failed codec configuration, status: %d", __func__, status);
+    return status;
+  }
+  env->ReleaseByteArrayElements(address, addr, 0);
+  delete[] chars;
+
+  return status;
+}
+
+static void setLhdcCodecExtendAPIDataNative(JNIEnv* env, jobject object,
+                                           jbyteArray address,
+                                           jbyteArray codecData){
+
+  std::shared_lock<std::shared_timed_mutex> lock(interface_mutex);
+  if (!sBluetoothA2dpInterface) {
+    ALOGE("%s: Failed to get the Bluetooth A2DP Interface", __func__);
+    return;
+  }
+
+  jbyte* addr = env->GetByteArrayElements(address, nullptr);
+  if (!addr) {
+    jniThrowIOException(env, EINVAL);
+    return;
+  }
+
+  RawAddress bd_addr;
+  bd_addr.FromOctets(reinterpret_cast<const uint8_t*>(addr));
+
+  char *chars = NULL;
+  int chars_len = env->GetArrayLength(codecData);
+  chars = jByteArrayToChar(env, codecData);
+
+  //to bt_av
+  sBluetoothA2dpInterface->setAPiData_lhdc(bd_addr, chars, chars_len);
+
+  env->ReleaseByteArrayElements(address, addr, 0);
+  delete[] chars;
+}
+/************************************************
+ * Savitech Patch - LHDC Extended API End
+ ***********************************************/
+
+
 static JNINativeMethod sMethods[] = {
     {"classInitNative", "()V", (void*)classInitNative},
     {"initNative", "(I[Landroid/bluetooth/BluetoothCodecConfig;)V",
@@ -485,6 +671,12 @@ static JNINativeMethod sMethods[] = {
     {"setCodecConfigPreferenceNative",
      "([B[Landroid/bluetooth/BluetoothCodecConfig;)Z",
      (void*)setCodecConfigPreferenceNative},
+
+    // Savitech Patch - LHDC Extended API
+    {"getLhdcCodecExtendAPIVerNative", "([B[B)I", (void*)getLhdcCodecExtendAPIVerNative},
+    {"getLhdcCodecExtendAPIConfigNative", "([B[B)I", (void*)getLhdcCodecExtendAPIConfigNative},
+    {"setLhdcCodecExtendAPIConfigNative", "([B[B)I", (void*)setLhdcCodecExtendAPIConfigNative},
+    {"setLhdcCodecExtendAPIDataNative", "([B[B)V", (void*)setLhdcCodecExtendAPIDataNative},
 };
 
 int register_com_android_bluetooth_a2dp(JNIEnv* env) {

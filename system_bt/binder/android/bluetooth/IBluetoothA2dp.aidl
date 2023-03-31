@@ -47,4 +47,17 @@ interface IBluetoothA2dp {
     int supportsOptionalCodecs(in BluetoothDevice device);
     int getOptionalCodecsEnabled(in BluetoothDevice device);
     oneway void setOptionalCodecsEnabled(in BluetoothDevice device, int value);
+    
+    // Savitech Patch LHDC Extended API - Start
+    int getLhdcCodecExtendAPIVer(in BluetoothDevice device, inout byte[] exApiVer);
+    int setLhdcCodecExtendAPIConfigAR(in BluetoothDevice device, in byte[] codecConfig);
+    int getLhdcCodecExtendAPIConfigAR(in BluetoothDevice device, inout byte[] codecConfig);
+    int setLhdcCodecExtendAPIConfigMeta(in BluetoothDevice device, in byte[] codecConfig);
+    int getLhdcCodecExtendAPIConfigMeta(in BluetoothDevice device, inout byte[] codecConfig);
+    // Savitech Patch LHDC Extended API - End
+    
+    int getLhdcCodecExtendAPIConfigA2dpCodecSpecific(in BluetoothDevice device, inout byte[] codecConfig);
+        
+    //LHDC Extended Function: data-type APIs
+    oneway void setLhdcCodecExtendAPIDataGyro2D(in BluetoothDevice device, in byte[] codecData);    
 }
